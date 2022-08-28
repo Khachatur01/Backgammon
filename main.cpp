@@ -1,5 +1,5 @@
 #include <iostream>
-#include "game/backgammon.h"
+#include "game/backgammon/backgammon.h"
 
 int main() {
     Backgammon backgammon;
