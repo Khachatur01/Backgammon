@@ -153,6 +153,9 @@ void Backgammon::clear_board() {
 }
 void Backgammon::set_peaces_on_board(const Player& current_player) {
     /*
+     * matrix indexes
+     *        0   1   2   3   4   5       6   7   8   9  10  11
+
              23  22  21  20  19  18      17  16  15  14  13  12 <--+
         +--< 11  10   9   8   7   6       5   4   3   2   1   0    |
         |                                                          |
@@ -167,18 +170,18 @@ void Backgammon::set_peaces_on_board(const Player& current_player) {
         +--> 12  13  14  15  16  17      18  19  20  21  22  23    |
               0   1   2   3   4   5       6   7   8   9  10  11 >--+
      * */
-
+    /* there is a bug when rendering peaces of bottom player to top part of board */
     for (uint8_t pip = 0; pip < Backgammon::PIPS_COUNT; ++pip) {
         if (pip >= 0 && pip < Backgammon::PIPS_COUNT / 2) {
             for (uint8_t i = 0; i < current_player.peaces[pip]; ++i) {
-                board[i][Backgammon::PIPS_COUNT / 2 - pip - 1] = current_player.peace; /* fill to top */
+                board[i][Backgammon::PIPS_COUNT / 2 - pip - 1] = current_player.peace; /* fill to bottom */
                 if (i == Backgammon::MAX_PEACE) {
                     board[i][Backgammon::PIPS_COUNT / 2 - pip - 1] = Backgammon::NUMBERS[current_player.peaces[pip] - 1];
                     break;
                 }
             }
             for (uint8_t i = 0; i < current_player.opponent->peaces[pip]; ++i) {
-                board[Backgammon::HEIGHT - 1 - i][pip] = current_player.opponent->peace; /* fill to bottom */
+                board[Backgammon::HEIGHT - 1 - i][pip] = current_player.opponent->peace; /* fill to top */
                 if (i == Backgammon::MAX_PEACE) {
                     board[Backgammon::HEIGHT - 1 - i][pip] = Backgammon::NUMBERS[current_player.opponent->peaces[pip] - 1];
                     break;
@@ -186,16 +189,16 @@ void Backgammon::set_peaces_on_board(const Player& current_player) {
             }
         } else { /* if (pip >= Backgammon::PIPS_COUNT / 2 && pip < Backgammon::PIPS_COUNT) */
             for (uint8_t i = 0; i < current_player.peaces[pip]; ++i) {
-                board[Backgammon::HEIGHT - 1 - i][pip - Backgammon::PIPS_COUNT / 2] = current_player.peace; /* fill to bottom */
+                board[Backgammon::HEIGHT - 1 - i][pip - Backgammon::PIPS_COUNT / 2] = current_player.peace; /* fill to top */
                 if (i == Backgammon::MAX_PEACE) {
                     board[Backgammon::HEIGHT - 1 - i][pip - Backgammon::PIPS_COUNT / 2] = Backgammon::NUMBERS[current_player.peaces[pip] - 1];
                     break;
                 }
             }
             for (uint8_t i = 0; i < current_player.opponent->peaces[pip]; ++i) {
-                board[i][Backgammon::PIPS_COUNT - pip] = current_player.opponent->peace;  /* fill to top */
+                board[i][Backgammon::PIPS_COUNT - pip - 1] = current_player.opponent->peace;  /* fill to bottom */
                 if (i == Backgammon::MAX_PEACE) {
-                    board[i][Backgammon::PIPS_COUNT - pip] = Backgammon::NUMBERS[current_player.opponent->peaces[pip] - 1];
+                    board[i][Backgammon::PIPS_COUNT - pip - 1] = Backgammon::NUMBERS[current_player.opponent->peaces[pip] - 1];
                     break;
                 }
             }
