@@ -7,6 +7,6 @@
 
 Player::Player(uint8_t pips_count, std::string peace) {
     this->peaces = new uint8_t[pips_count]{0};
-    this->peaces[0] = 15;
+    this->peaces[0] = this->PEACES_COUNT;
     this->peace = peace;
 }

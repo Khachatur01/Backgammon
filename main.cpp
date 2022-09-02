@@ -10,6 +10,7 @@ int main() {
     getline(std::cin, enter);
     backgammon.throw_dice();
 
+    game_over_checking_loop:
     while (!backgammon.is_game_over()) {
         uint8_t pip_index;
         uint8_t to;
@@ -19,9 +20,9 @@ int main() {
         if (pip_index == '0') {
             backgammon.cancel_moves();
             continue;
-        } else if (pip_index == '1') {
-            backgammon.commit_moves();
-            continue;
+        } else if (pip_index == '1' && backgammon.commit_moves()) {
+            backgammon.throw_dice();
+            goto game_over_checking_loop;
         }
         while (!backgammon.take_peace(pip_index)) {
             std::cout << "Invalid peace! Take another(0 to cancel all moves. 1 to commit): ";
@@ -29,9 +30,9 @@ int main() {
             if (pip_index == '0') {
                 backgammon.cancel_moves();
                 continue;
-            } else if (pip_index == '1') {
-                backgammon.commit_moves();
-                continue;
+            } else if (pip_index == '1' && backgammon.commit_moves()) {
+                backgammon.throw_dice();
+                goto game_over_checking_loop;
             }
         }
 
