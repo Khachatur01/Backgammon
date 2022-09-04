@@ -1,0 +1,8 @@
+#ifndef BACKGAMMON_CLIENTSOCKET_H
+#define BACKGAMMON_CLIENTSOCKET_H
+
+class ClientSocket {
+
+};
+
+#endif //BACKGAMMON_CLIENTSOCKET_H

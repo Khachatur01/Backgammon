@@ -15,8 +15,9 @@ const std::string Backgammon::SPACE = " ";
 const std::string Backgammon::SEPARATOR = "|";
 const std::string Backgammon::WHITE = "⛂";
 const std::string Backgammon::BLACK = "⛀";
-const std::string Backgammon::UP = "⬆";
-const std::string Backgammon::DOWN = "⬇";
+const std::string Backgammon::UP = "⮝";
+const std::string Backgammon::DOWN = "⮟";
+const std::string Backgammon::RIGHT = "⮞";
 const std::string Backgammon::POSSIBLE_MOVE = "🞙";
 
 uint8_t Backgammon::opponent_pip(const Player& player, uint8_t pip) {
@@ -101,8 +102,8 @@ std::vector<uint8_t> Backgammon::get_available_pips_for_peace(const Player& play
         if (second_dice_move != -1) {
             moves.push_back(second_dice_move);
         }
-        /* if both moves can be done, it means that combined_dice move can be done */
-        if (first_dice_move != -1 && second_dice_move != -1 && combined_dice_move != -1) {
+        /* if even one move can be done, it means that combined_dice move can be done */
+        if ((first_dice_move != -1 || second_dice_move != -1) && combined_dice_move != -1) {
             moves.push_back(combined_dice_move);
         }
     }
@@ -245,7 +246,8 @@ std::string Backgammon::render_row(uint8_t start, uint8_t end, uint8_t row, boar
     }
     return frame_row;
 }
-std::string Backgammon::render_frame(const Player& player, const Player& viewer, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board) {
+std::string Backgammon::render_frame(const Player& player, const Player& viewer, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips) {
+    board_t board;
     std::string frame;
 
     Backgammon::clear_board(board);
@@ -284,6 +286,9 @@ std::string Backgammon::render_frame(const Player& player, const Player& viewer,
     for (uint8_t row = 0; row < uint8_t(Backgammon::WIDTH * 3 + 2); ++row) {
         frame += Backgammon::BORDER;
     }
+    if (!viewer.can_bear_off) {
+        frame += Backgammon::SPACE + Backgammon::RIGHT;
+    }
     frame += '\n';
 
     /* bottom index row */
@@ -298,19 +303,20 @@ std::string Backgammon::render_frame(const Player& player, const Player& viewer,
         frame += Backgammon::SPACE + Backgammon::SPACE;
     }
     frame += '\n';
+
     return frame;
 }
+
 void Backgammon::render() {
-    system("clear"); /* todo make cross platform */
+    system("clear");
 
     std::cout << "Move -> " << (this->player != nullptr ? this->player->peace : "") << std::endl;
     std::cout << Backgammon::render_frame(
-            *this->player,
+            (this->player == nullptr) ? this->players[0] : *this->player,
             (this->viewer == nullptr) ? this->players[0] : *this->viewer,
             this->dices,
             this->available_pips_for_selected_peace,
-            this->all_available_pips,
-            this->board
+            this->all_available_pips
     );
 }
 
@@ -337,8 +343,7 @@ std::string Backgammon::get_frame() {
         (this->viewer == nullptr) ? this->players[0] : *this->viewer,
         this->dices,
         this->available_pips_for_selected_peace,
-        this->all_available_pips,
-        this->board
+        this->all_available_pips
     );
 }
 
@@ -411,9 +416,19 @@ bool Backgammon::commit_moves() {
         return false;
     }
     this->done_moves.clear();
-    this->player = this->player->opponent;
+    this->player = this->player->opponent; /* swap player */
     this->viewer = this->player;
     this->selected_peace = Backgammon::PIPS_COUNT; /* no selection */
+
+    if (!this->player->can_bear_off) { /* if player can't bear off before commit, check if it is possible after commit */
+        this->player->can_bear_off = true;
+        for (uint8_t i = 0; i < Backgammon::PIPS_COUNT - 6; ++i) {
+            if (this->player->peaces[i] != 0) { /* if there is peace before pip number 18 (not included) */
+                this->player->can_bear_off = false;
+            }
+        }
+    }
+
     this->available_pips_for_selected_peace = this->get_available_pips_for_peace(
             *this->player,
             this->selected_peace,

@@ -7,6 +7,7 @@ public:
     uint8_t *peaces;
     std::string peace;
     const uint8_t PEACES_COUNT = 15;
+    bool can_bear_off = false;
 
     Player(uint8_t pips_count, std::string peace);
 };
