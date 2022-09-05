@@ -62,10 +62,10 @@ private:
     static bool can_play_from_head(const Player& player, dices_t dices, const std::vector<move_t>& done_moves);
     static void clear_board(board_t& board);
     static void set_dices_on_bord(dices_t dices, board_t& board);
-    static void set_moves_on_bord(const Player& player, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board); /* set moves hint to board */
+    static void set_moves_on_bord(const Player& player, uint8_t peace, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board); /* set moves hint to board */
     static void set_peaces_on_board(const Player& player, board_t& board);
     static std::string render_row(uint8_t start, uint8_t end, uint8_t row, board_t& board);
-    static std::string render_frame(const Player& player, const Player& viewer, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips);
+    static std::string render_frame(const Player& player, const Player& viewer, uint8_t peace, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips);
     void render();
 
 public:

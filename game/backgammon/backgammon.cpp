@@ -212,8 +212,8 @@ void Backgammon::set_dices_on_bord(dices_t dices, board_t& board) {
     board[Backgammon::HEIGHT / 2 - 1][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::DICES[dices.second - 1];
     board[Backgammon::HEIGHT / 2][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::NUMBERS[dices.second - 1];
 }
-void Backgammon::set_moves_on_bord(const Player& player, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board) {
-    if (available_pips_for_selected_peace.empty()) {
+void Backgammon::set_moves_on_bord(const Player& player, uint8_t peace, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board) {
+    if (peace == Backgammon::PIPS_COUNT) { /* if no selected peace, set all available pips */
         for (uint8_t pip : all_available_pips) {
             if (pip >= 0 && pip < Backgammon::PIPS_COUNT / 2) {
                 board[player.peaces[pip]][Backgammon::PIPS_COUNT / 2 - pip - 1] = Backgammon::POSSIBLE_MOVE;
@@ -221,15 +221,30 @@ void Backgammon::set_moves_on_bord(const Player& player, const std::vector<uint8
                 board[Backgammon::HEIGHT - player.peaces[pip] - 1][pip - Backgammon::PIPS_COUNT / 2] = Backgammon::POSSIBLE_MOVE;
             }
         }
-    }
-
-    for (uint8_t pip : available_pips_for_selected_peace) {
-        if (pip >= 0 && pip < Backgammon::PIPS_COUNT / 2) {
-            board[player.peaces[pip]][Backgammon::PIPS_COUNT / 2 - pip - 1] = Backgammon::UP;
+    } else { /* if there is selected peace, set only available pips for that peace */
+        if (peace >= 0 && peace < Backgammon::PIPS_COUNT / 2) { /* show selected peace */
+            uint8_t row = player.peaces[peace];
+            if (row > MAX_PEACE) {
+                row = MAX_PEACE + 1;
+            }
+            board[row][Backgammon::PIPS_COUNT / 2 - peace - 1] = Backgammon::DOWN;
         } else {
-            board[Backgammon::HEIGHT - player.peaces[pip] - 1][pip - Backgammon::PIPS_COUNT / 2] = Backgammon::DOWN;
+            uint8_t row = Backgammon::HEIGHT - player.peaces[peace] - 1;
+            if (row > MAX_PEACE) {
+                row = MAX_PEACE + 1;
+            }
+            board[row][peace - Backgammon::PIPS_COUNT / 2] = Backgammon::UP;
+        }
+
+        for (uint8_t pip : available_pips_for_selected_peace) {
+            if (pip >= 0 && pip < Backgammon::PIPS_COUNT / 2) {
+                board[player.peaces[pip]][Backgammon::PIPS_COUNT / 2 - pip - 1] = Backgammon::UP;
+            } else {
+                board[Backgammon::HEIGHT - player.peaces[pip] - 1][pip - Backgammon::PIPS_COUNT / 2] = Backgammon::DOWN;
+            }
         }
     }
+
 }
 std::string Backgammon::render_row(uint8_t start, uint8_t end, uint8_t row, board_t& board) {
     std::string frame_row;
@@ -246,17 +261,17 @@ std::string Backgammon::render_row(uint8_t start, uint8_t end, uint8_t row, boar
     }
     return frame_row;
 }
-std::string Backgammon::render_frame(const Player& player, const Player& viewer, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips) {
+std::string Backgammon::render_frame(const Player& player, const Player& viewer, uint8_t peace, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips) {
     board_t board;
     std::string frame;
 
     Backgammon::clear_board(board);
     Backgammon::set_peaces_on_board(viewer, board);
     Backgammon::set_dices_on_bord(dices, board);
-    Backgammon::set_moves_on_bord(player, available_pips_for_selected_peace, all_available_pips, board);
+    Backgammon::set_moves_on_bord(player, peace, available_pips_for_selected_peace, all_available_pips, board);
 
     /* top index row */
-    frame += Backgammon::SPACE;
+    frame += Backgammon::SPACE + Backgammon::SPACE + Backgammon::SPACE;
     for (uint8_t col = 'l'; col >= 'g'; --col) {
         frame += (char)col;
         frame += Backgammon::SPACE + Backgammon::SPACE;
@@ -268,31 +283,47 @@ std::string Backgammon::render_frame(const Player& player, const Player& viewer,
     }
     frame += '\n';
 
+    /* opponent bore off peaces top border */
+    frame += Backgammon::BORDER + Backgammon::BORDER;
     /* top border */
     for (uint8_t col = 0; col < uint8_t(Backgammon::WIDTH * 3 + 2); ++col) {
         frame += Backgammon::BORDER;
     }
+    /* player bore off peaces top border */
+    frame += Backgammon::BORDER + Backgammon::BORDER;
     frame += '\n';
 
     for (uint8_t row = 0; row < Backgammon::HEIGHT; ++row) {
+        /* opponent bore off peaces left/right borders and peaces */
+        frame += Backgammon::BORDER + (row < viewer.opponent->bore_off_peaces_count ? viewer.opponent->peace : Backgammon::SPACE);
+
         frame += Backgammon::BORDER; /* left border */
         frame += render_row(0, Backgammon::WIDTH / 2, row, board);
         frame += Backgammon::BORDER + Backgammon::BORDER; /* middle border */
         frame += render_row(Backgammon::WIDTH / 2, Backgammon::WIDTH, row, board);
-        frame += Backgammon::BORDER + '\n'; /* right border */
+        frame += Backgammon::BORDER; /* right border */
+
+        /* player bore off peaces left/right borders and peaces */
+        frame += (row >= Backgammon::HEIGHT - viewer.bore_off_peaces_count ? viewer.peace : Backgammon::SPACE) + Backgammon::BORDER;
+        frame += '\n';
     }
 
+    /* opponent bore off peaces bottom border */
+    frame += Backgammon::BORDER + Backgammon::BORDER;
     /* bottom border */
     for (uint8_t row = 0; row < uint8_t(Backgammon::WIDTH * 3 + 2); ++row) {
         frame += Backgammon::BORDER;
     }
-    if (!viewer.can_bear_off) {
+    /* player bore off peaces bottom border */
+    frame += Backgammon::BORDER + Backgammon::BORDER;
+    /* show arrow right if he can bear off(remove) selected peace */
+    if (viewer.can_bear_off) {
         frame += Backgammon::SPACE + Backgammon::RIGHT;
     }
     frame += '\n';
 
     /* bottom index row */
-    frame += Backgammon::SPACE;
+    frame += Backgammon::SPACE + Backgammon::SPACE + Backgammon::SPACE;
     for (uint8_t col = 'm'; col <= 'r'; ++col) {
         frame += (char)col;
         frame += Backgammon::SPACE + Backgammon::SPACE;
@@ -310,10 +341,11 @@ std::string Backgammon::render_frame(const Player& player, const Player& viewer,
 void Backgammon::render() {
     system("clear");
 
-    std::cout << "Move -> " << (this->player != nullptr ? this->player->peace : "") << std::endl;
+    std::cout << "Move " << Backgammon::RIGHT << " " << (this->player != nullptr ? this->player->peace : "") << std::endl;
     std::cout << Backgammon::render_frame(
             (this->player == nullptr) ? this->players[0] : *this->player,
             (this->viewer == nullptr) ? this->players[0] : *this->viewer,
+            this->selected_peace,
             this->dices,
             this->available_pips_for_selected_peace,
             this->all_available_pips
@@ -341,6 +373,7 @@ std::string Backgammon::get_frame() {
     Backgammon::render_frame(
         *this->player,
         (this->viewer == nullptr) ? this->players[0] : *this->viewer,
+        this->selected_peace,
         this->dices,
         this->available_pips_for_selected_peace,
         this->all_available_pips
