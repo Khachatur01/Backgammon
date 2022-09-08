@@ -41,7 +41,7 @@ int8_t Backgammon::get_move(const Player& player, uint8_t pip, uint8_t step/* di
         /* if opponent don't have peaces in that pip */
         player.opponent->peaces[Backgammon::opponent_pip(player, move)] != 0
     ) {
-        move = -1;
+        move = Move::UNAVAILABLE;
     }
 
     return move;
@@ -65,7 +65,7 @@ std::vector<uint8_t> Backgammon::get_available_pips_for_peace(const Player& play
         for (uint8_t i = 0; i < available_moves_count; ++i) {
             int8_t move = Backgammon::get_move(player, peace, dices.first * (i + 1), can_bear_off);
             /* if move can be done and opponent don't have peace on that pip */
-            if (move != -1) {
+            if (move != Move::UNAVAILABLE) {
                 moves.push_back(move);
             } else {
                 break;
@@ -81,30 +81,34 @@ std::vector<uint8_t> Backgammon::get_available_pips_for_peace(const Player& play
             uint8_t move_step = move.second - move.first;
             /* first dice is played */
             if (move_step == dices.first) {
-                first_dice_move = -1;
+                first_dice_move = Move::DONE;
             }
             /* second dice is played */
             else if (move_step == dices.second) {
-                second_dice_move = -1;
+                second_dice_move = Move::DONE;
             }
             /* both dices are played */
             else if (move_step == dices.first + dices.second) {
-                first_dice_move = -1;
-                second_dice_move = -1;
-                combined_dice_move = -1;
+                first_dice_move = Move::DONE;
+                second_dice_move = Move::DONE;
+                combined_dice_move = Move::DONE;
             }
         }
 
-        /* if move can be done and opponent don't have peace on that pip */
-        if (first_dice_move != -1) {
+        /* if move can be done but didn't and opponent don't have peace on that pip */
+        if (first_dice_move != Move::UNAVAILABLE && first_dice_move != Move::DONE) {
             moves.push_back(first_dice_move);
         }
-        /* if move can be done and opponent don't have peace on that pip */
-        if (second_dice_move != -1) {
+        /* if move can be done but didn't and opponent don't have peace on that pip */
+        if (second_dice_move != Move::UNAVAILABLE && second_dice_move != Move::DONE) {
             moves.push_back(second_dice_move);
         }
-        /* if even one move can be done, it means that combined_dice move can be done */
-        if ((first_dice_move != -1 || second_dice_move != -1) && combined_dice_move != -1) {
+        /* if even one move can be done, but both didn't, it means that combined_dice move can be done */
+        if (
+                (first_dice_move != Move::UNAVAILABLE || second_dice_move != Move::UNAVAILABLE) &&
+                (first_dice_move != Move::DONE && second_dice_move != Move::DONE) &&
+                combined_dice_move != Move::UNAVAILABLE
+        ) {
             moves.push_back(combined_dice_move);
         }
     }

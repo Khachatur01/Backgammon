@@ -4,6 +4,11 @@
 #include <vector>
 #include <array>
 
+enum Move {
+    UNAVAILABLE = -1,
+    DONE = -2,
+};
+
 class Backgammon {
 private:
     static const std::string NUMBERS[15];
