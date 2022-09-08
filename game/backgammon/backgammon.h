@@ -45,7 +45,7 @@ private:
     /**
      * returns -1 if there is no possible move(when pip gets out of board)
      * */
-    static int8_t get_move(const Player& player, uint8_t pip, uint8_t step);
+    static int8_t get_move(const Player& player, uint8_t pip, uint8_t step, bool can_bear_off);
     /**
      * get opponent pip equivalent to player pip
      * */
@@ -53,12 +53,19 @@ private:
     /**
      * get available pips for selected peace
      * */
-    static std::vector<uint8_t> get_available_pips_for_peace(const Player& player, uint8_t peace, dices_t dices, const std::vector<move_t>& done_moves);
+    static std::vector<uint8_t> get_available_pips_for_peace(const Player& player, uint8_t peace, dices_t dices, const std::vector<move_t>& done_moves, bool can_bear_off);
     /**
      * get all available pips for dices
      * */
-    static std::vector<uint8_t> get_all_available_pips(const Player& player, dices_t dices, const std::vector<move_t>& done_moves);
-    static bool have_moves(const Player& player, dices_t dices, const std::vector<move_t>& done_moves);
+    static std::vector<uint8_t> get_all_available_pips(const Player& player, dices_t dices, const std::vector<move_t>& done_moves, bool can_bear_off);
+    /**
+     * check if player can do move
+     * */
+    static bool have_moves(const Player& player, dices_t dices, const std::vector<move_t>& done_moves, bool can_bear_off);
+    /**
+     * check if player already didn't take peace from head.
+     * when game just started and dices are equals and can't play all 4 moves, let take from head another one.
+     * */
     static bool can_play_from_head(const Player& player, dices_t dices, const std::vector<move_t>& done_moves);
     static void clear_board(board_t& board);
     static void set_dices_on_bord(dices_t dices, board_t& board);
