@@ -21,18 +21,18 @@ uint8_t Player::opponent_pip(uint8_t pip) const {
     }
     return pip;
 }
-int8_t Player::get_move(uint8_t pip, uint8_t step) const {
+int8_t Player::get_move_pip(uint8_t pip, uint8_t step) const {
     if (step == 0) {
         return Move::UNAVAILABLE;
     }
-    auto move = int8_t(pip + step);
-    /* opponent have peaces in that pip */
-    if (move < this->PIPS_COUNT && this->opponent->peaces[this->opponent_pip(move)] != 0) {
-//        if (true) {
-//
-//        }
-        move = Move::UNAVAILABLE;
-    } else if (move >= this->PIPS_COUNT) { /* bearing off(removing) */
+    auto move_pip = int8_t(pip + step);
+
+    if (
+            (move_pip < this->PIPS_COUNT && this->opponent->peaces[this->opponent_pip(move_pip)] != 0) || /* opponent have peaces in that pip */
+            this->move_blocks_opponent(move_pip) /* after move player will block opponent to go forward */
+    ) {
+        move_pip = Move::UNAVAILABLE;
+    } else if (move_pip >= this->PIPS_COUNT) { /* bearing off(removing) */
         bool have_higher_peaces = false;
         for (uint8_t temp_pip = this->PIPS_COUNT - this->PIPS_COUNT / 4; temp_pip < pip; ++temp_pip) {
             if (this->peaces[temp_pip] != 0) {
@@ -42,11 +42,11 @@ int8_t Player::get_move(uint8_t pip, uint8_t step) const {
         }
         /* if player can't bear_off or have higher peaces and step(dice) doesn't equal to selected PEACE's pip */
         if (!this->can_bear_off || (have_higher_peaces && this->PIPS_COUNT - pip != step)) {
-            move = Move::UNAVAILABLE;
+            move_pip = Move::UNAVAILABLE;
         }
     }
 
-    return move;
+    return move_pip;
 }
 std::vector<uint8_t> Player::get_available_pips_for_peace(uint8_t peace, dices_t dices, const std::vector<move_t>& done_moves) const {
     std::vector<uint8_t> moves;
@@ -65,7 +65,7 @@ std::vector<uint8_t> Player::get_available_pips_for_peace(uint8_t peace, dices_t
             available_moves_count -= move_step / dices.first;
         }
         for (uint8_t i = 0; i < available_moves_count; ++i) {
-            int8_t move = this->get_move(peace, dices.first * (i + 1));
+            int8_t move = this->get_move_pip(peace, dices.first * (i + 1));
             /* if move can be done and opponent don't have PEACE on that pip */
             if (move == Move::UNAVAILABLE) {
                 break;
@@ -77,9 +77,9 @@ std::vector<uint8_t> Player::get_available_pips_for_peace(uint8_t peace, dices_t
             }
         }
     } else {
-        int8_t first_dice_move = this->get_move(peace, dices.first);
-        int8_t second_dice_move = this->get_move(peace, dices.second);
-        int8_t combined_dice_move = this->get_move(peace, dices.first + dices.second);
+        int8_t first_dice_move = this->get_move_pip(peace, dices.first);
+        int8_t second_dice_move = this->get_move_pip(peace, dices.second);
+        int8_t combined_dice_move = this->get_move_pip(peace, dices.first + dices.second);
 
         /* check if dice played */
         for (move_t move: done_moves) {
@@ -155,4 +155,34 @@ bool Player::can_play_from_head(dices_t dices, const std::vector<move_t>& done_m
             done_moves.end(),
             [](const move_t &move){return move.first == 0;}
     );
+}
+bool Player::have_peaces_after(uint8_t pip) const {
+    for (pip = pip + 1; pip < this->PIPS_COUNT; ++pip) {
+        if (this->peaces[pip] != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Player::move_blocks_opponent(uint8_t move_pip) const {
+    if (!this->opponent->have_peaces_after(this->opponent_pip(move_pip))) {
+        uint8_t continuously_peaces_count = 0; /* number of continuously connected peaces, except moving peace */
+        uint8_t temp_pip = move_pip - 1;
+        /* check left part of move_pip */
+        while (this->peaces[temp_pip] != 0 && temp_pip >= 0 && temp_pip < this->PIPS_COUNT) {
+            temp_pip--;
+            continuously_peaces_count++;
+        }
+        temp_pip = move_pip + 1;
+        /* check right part of move_pip */
+        while (this->peaces[temp_pip] != 0 && temp_pip >= 0 && temp_pip < this->PIPS_COUNT) {
+            temp_pip++;
+            continuously_peaces_count++;
+        }
+
+        if (continuously_peaces_count > 4) {
+            return true;
+        }
+    }
+    return false;
 }

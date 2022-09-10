@@ -22,7 +22,7 @@ public:
     /**
      * returns -1 if there is no possible move(when pip gets out of board)
      * */
-    [[nodiscard]] int8_t get_move(uint8_t pip, uint8_t step) const;
+    [[nodiscard]] int8_t get_move_pip(uint8_t pip, uint8_t step) const;
     /**
      * get available pips for selected PEACE
      * */
@@ -40,6 +40,15 @@ public:
      * when game just started and dices are equals and can't play all 4 moves, let take from head another one.
      * */
     [[nodiscard]] bool can_play_from_head(dices_t dices, const std::vector<move_t>& done_moves) const;
+    /**
+     * check if player have peaces after pip
+     * */
+    [[nodiscard]] bool have_peaces_after(uint8_t pip) const;
+    /**
+     * check if move will block opponent to go forward (if opponent have peaces after move_pip, player can block opponent)
+     * */
+    [[nodiscard]] bool move_blocks_opponent(uint8_t move_pip) const;
+
 };
 
 #endif //BACKGAMMON_PLAYER_H
