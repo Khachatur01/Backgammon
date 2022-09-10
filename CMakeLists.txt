@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 project(Backgammon)
 
+#set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
 set(CMAKE_CXX_STANDARD 20)
 
 add_library(backgammon STATIC game/backgammon/backgammon.cpp)
