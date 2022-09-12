@@ -28,8 +28,8 @@ int8_t Player::get_move_pip(uint8_t pip, uint8_t step) const {
     auto move_pip = int8_t(pip + step);
 
     if (
-            (move_pip < this->PIPS_COUNT && this->opponent->peaces[this->opponent_pip(move_pip)] != 0) || /* opponent have peaces in that pip */
-            this->move_blocks_opponent(move_pip) /* after move player will block opponent to go forward */
+        (move_pip < this->PIPS_COUNT && this->opponent->peaces[this->opponent_pip(move_pip)] != 0) || /* opponent have peaces in that pip */
+        this->move_blocks_opponent(move_pip) /* after move player will block opponent to go forward */
     ) {
         move_pip = Move::UNAVAILABLE;
     } else if (move_pip >= this->PIPS_COUNT) { /* bearing off(removing) */

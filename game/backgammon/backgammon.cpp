@@ -241,16 +241,7 @@ std::string Backgammon::repeat(const std::string& text, uint8_t count) {
 
 void Backgammon::render() {
     system("clear");
-
-    std::cout << "Move " << Backgammon::RIGHT << " " << (this->player != nullptr ? this->player->PEACE : "") << std::endl;
-    std::cout << Backgammon::render_frame(
-            (this->player == nullptr) ? this->players[0] : *this->player,
-            (this->viewer == nullptr) ? this->players[0] : *this->viewer,
-            this->selected_peace,
-            this->dices,
-            this->available_pips_for_selected_peace,
-            this->all_available_pips
-    );
+    std::cout << this->get_frame();
 }
 
 /* public (interface) */
@@ -270,7 +261,7 @@ void Backgammon::start() {
 }
 
 std::string Backgammon::get_frame() {
-    return "Move -> " + (this->player != nullptr ? this->player->PEACE : "") + '\n' +
+    return "Move " + Backgammon::RIGHT + " " + (this->player != nullptr ? this->player->PEACE : "") + '\n' +
            Backgammon::render_frame(
         *this->player,
         (this->viewer == nullptr) ? this->players[0] : *this->viewer,
@@ -353,12 +344,13 @@ bool Backgammon::take_peace(uint8_t peace_index) {
     return false;
 }
 bool Backgammon::move_to(uint8_t pip) {
+    bool done = false;
     if (pip == 'z') {
         bool bored_off = this->bear_off();
         if (bored_off) {
             this->release_peace();
         }
-        return bored_off;
+        done = bored_off;
     }
 
     pip -= 'a';
@@ -367,9 +359,14 @@ bool Backgammon::move_to(uint8_t pip) {
         this->player->peaces[this->selected_peace]--;
         this->player->peaces[pip]++;
         this->release_peace();
-        return true;
+        done = true;
     }
-    return false;
+
+    if (done && this->auto_commit && this->all_available_pips.empty()) {
+        this->commit_moves();
+        this->throw_dice();
+    }
+    return done;
 }
 bool Backgammon::bear_off() {
     if (this->player->can_bear_off) {
@@ -395,9 +392,20 @@ bool Backgammon::commit_moves() {
         return false;
     }
     this->done_moves.clear();
+
+    /* check winner */
+    this->winner = this->player; /* temporally set winner as current player */
+    for (uint8_t pip = 0; pip < Backgammon::PIPS_COUNT; ++pip) {
+        if (this->player->peaces[pip] != 0) {
+            this->winner = nullptr; /* if player have peaces, set winner as nullptr */
+            break;
+        }
+    }
+
     this->player = this->player->opponent; /* swap player */
     this->viewer = this->player;
     this->release_peace();
+
     return true;
 }
 void Backgammon::cancel_moves() {
@@ -414,17 +422,6 @@ void Backgammon::cancel_moves() {
     this->render();
 }
 
-bool Backgammon::is_game_over() {
-    bool white_win = true;
-    bool black_win = true;
-    for (uint8_t pip = 0; pip < Backgammon::PIPS_COUNT; ++pip) {
-        if (this->players[0].peaces[pip] != 0) {
-            white_win = false;
-        }
-        if (this->players[1].peaces[pip] != 0) {
-            black_win = false;
-        }
-    }
-
-    return white_win || black_win;
+Player* Backgammon::get_winner() {
+    return this->winner;
 }

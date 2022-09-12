@@ -34,6 +34,7 @@ private:
     };
     Player *player = nullptr;
     Player *viewer = nullptr;
+    Player *winner = nullptr;
     uint8_t selected_peace = Backgammon::PIPS_COUNT; /* no selection */
     std::vector<uint8_t> available_pips_for_selected_peace;
     std::vector<uint8_t> all_available_pips;
@@ -47,23 +48,25 @@ private:
     static void set_peaces_on_board(const Player& player, board_t& board);
     static std::string render_row(uint8_t start, uint8_t end, uint8_t row, board_t& board);
     static std::string render_frame(const Player& player, const Player& viewer, uint8_t peace, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips);
-    void render();
     bool bear_off(); /* remove PEACE */
 
     static std::string repeat(const std::string& text, uint8_t count);
 
 public:
+    bool auto_commit = false;
+
     Backgammon();
     void start();
 
     std::string get_frame();
+    void render();
     void throw_dice();
     bool take_peace(uint8_t peace_index);
     bool release_peace();
     bool move_to(uint8_t pip);
     bool commit_moves();
     void cancel_moves();
-    [[nodiscard]] bool is_game_over();
+    Player* get_winner();
 };
 
 #endif //BACKGAMMON_BACKGAMMON_H
