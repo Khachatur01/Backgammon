@@ -6,6 +6,11 @@ enum Move {
     DONE = -2,
 };
 
+enum Player_t {
+    WHITE,
+    BLACK
+};
+
 typedef std::pair<uint8_t, uint8_t> dices_t;
 typedef std::pair<uint8_t, uint8_t> move_t; /* first: from_pip, second: to_pip */
 

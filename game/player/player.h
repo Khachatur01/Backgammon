@@ -12,8 +12,9 @@ public:
     const uint8_t PEACES_COUNT = 15;
     const uint8_t PIPS_COUNT;
     const std::string PEACE;
+    const Player_t TYPE;
 
-    Player(uint8_t pips_count, std::string peace);
+    Player(uint8_t pips_count, std::string peace, Player_t type);
 
     /**
      * get opponent pip equivalent to player pip

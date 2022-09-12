@@ -6,7 +6,7 @@
 /* private */
 
 /* public */
-Player::Player(uint8_t pips_count, std::string peace) : PIPS_COUNT(pips_count), PEACE(std::move(peace)) {
+Player::Player(uint8_t pips_count, std::string peace, Player_t type) : PIPS_COUNT(pips_count), PEACE(std::move(peace)), TYPE(type) {
     this->peaces = new uint8_t[pips_count]{0};
     this->peaces[0] = this->PEACES_COUNT;
 }

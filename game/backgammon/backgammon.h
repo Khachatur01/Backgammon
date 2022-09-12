@@ -4,6 +4,7 @@
 #include "../player/player.h"
 #include <vector>
 #include <array>
+#include <unordered_map>
 
 class Backgammon {
 private:
@@ -28,12 +29,9 @@ private:
 
     typedef std::array<std::array<std::string, Backgammon::WIDTH>, Backgammon::HEIGHT> board_t;
 
-    Player players[2] = {
-            Player(Backgammon::PIPS_COUNT, Backgammon::WHITE),
-            Player(Backgammon::PIPS_COUNT, Backgammon::BLACK)
-    };
+    Player white_player = Player(Backgammon::PIPS_COUNT, Backgammon::WHITE, Player_t::WHITE);
+    Player black_player = Player(Backgammon::PIPS_COUNT, Backgammon::BLACK, Player_t::BLACK);
     Player *player = nullptr;
-    Player *viewer = nullptr;
     Player *winner = nullptr;
     uint8_t selected_peace = Backgammon::PIPS_COUNT; /* no selection */
     std::vector<uint8_t> available_pips_for_selected_peace;
@@ -43,9 +41,9 @@ private:
     board_t board;
 
     static void clear_board(board_t& board);
+    static void set_peaces_on_board(const Player& viewer, board_t& board);
     static void set_dices_on_bord(dices_t dices, board_t& board);
     static void set_moves_on_bord(const Player& player, uint8_t peace, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board); /* set moves hint to board */
-    static void set_peaces_on_board(const Player& player, board_t& board);
     static std::string render_row(uint8_t start, uint8_t end, uint8_t row, board_t& board);
     static std::string render_frame(const Player& player, const Player& viewer, uint8_t peace, dices_t dices, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips);
     bool bear_off(); /* remove PEACE */
@@ -56,16 +54,17 @@ public:
     bool auto_commit = false;
 
     Backgammon();
-    void start();
+    void start(bool render = true);
 
-    std::string get_frame();
+    std::string get_frame(Player_t viewer_t);
+    void render(Player_t viewer_t);
     void render();
-    void throw_dice();
-    bool take_peace(uint8_t peace_index);
-    bool release_peace();
-    bool move_to(uint8_t pip);
-    bool commit_moves();
-    void cancel_moves();
+    void throw_dice(bool render = true);
+    bool take_peace(uint8_t peace_index, bool render = true);
+    bool release_peace(bool render = true);
+    bool move_to(uint8_t pip, bool render = true);
+    bool commit_moves(bool render = true);
+    void cancel_moves(bool render = true);
     Player* get_winner();
 };
 
