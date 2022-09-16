@@ -288,12 +288,15 @@ std::string Backgammon::get_frame(Player_t viewer_t) {
         this->all_available_pips
     );
 }
+void Backgammon::clear_screen() {
+    system("clear"); /* make cross-platform */
+}
 void Backgammon::render(Player_t viewer_t) {
-    system("clear");
+    Backgammon::clear_screen();
     std::cout << this->get_frame(viewer_t);
 }
 void Backgammon::render() {
-    system("clear");
+    Backgammon::clear_screen();
     std::cout << this->get_frame(this->player->TYPE);
 }
 

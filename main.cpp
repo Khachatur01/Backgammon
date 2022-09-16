@@ -1,44 +1,35 @@
+#ifndef IO_STREAM
 #include <iostream>
-#include "game/backgammon/backgammon.h"
+#define IO_STREAM
+#endif
+
+#include "game/mode/local.cpp"
+#include "game/mode/network.cpp"
+#include "game/mode/bot.cpp"
 
 int main() {
-    Backgammon backgammon;
+    char game_mode;
+    std::cout << "Welcome to Backgammon console game.\n";
+    std::cout << "Select game mode.\n";
+    std::cout << "a) Local 2 player\n";
+    std::cout << "b) Network 2 player\n";
+    std::cout << "c) Play with computer\n";
 
-    backgammon.start();
-    backgammon.auto_commit = false;
-    std::string enter;
-    std::cout << "Press Enter to throw dices: ";
-    getline(std::cin, enter);
-    backgammon.throw_dice();
+    do {
+        std::cin >> game_mode;
+    } while (game_mode < 'a' || game_mode > 'c');
 
-    game_over_checking_loop:
-    while (backgammon.get_winner() == nullptr) {
-        uint8_t pip_index;
-        uint8_t to;
-
-        do {
-            backgammon.render(); /* to clear unnecessary messages */
-            std::cout << "Take peace(0 to cancel all moves. 1 to commit): ";
-            std::cin >> pip_index;
-            if (pip_index == '0') {
-                backgammon.cancel_moves();
-                continue;
-            } else if (pip_index == '1' && backgammon.commit_moves()) {
-                backgammon.throw_dice();
-                goto game_over_checking_loop;
-            }
-        } while (!backgammon.take_peace(pip_index));
-
-        do {
-            backgammon.render(); /* to clear unnecessary messages */
-            std::cout << "Move to(0 to cancel all moves): ";
-            std::cin >> to;
-            if (to == '0') {
-                backgammon.cancel_moves();
-                continue;
-            }
-        } while (!backgammon.move_to(to));
+    switch (game_mode) {
+        case 'a':
+            local_mode();
+            break;
+        case 'b':
+            network_mode();
+            break;
+        case 'c':
+            bot_mode();
+            break;
+        default:
+            break;
     }
-    std::cout << "Game over\n" << "Winner is " << backgammon.get_winner()->PEACE;
-    return 0;
 }

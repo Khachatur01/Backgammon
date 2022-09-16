@@ -1,5 +1,5 @@
-#ifndef BACKGAMMON_BACKGAMMON_H
-#define BACKGAMMON_BACKGAMMON_H
+#ifndef BACKGAMMON_H
+#define BACKGAMMON_H
 #include "../type/types.h"
 #include "../player/player.h"
 #include <vector>
@@ -57,6 +57,7 @@ public:
     void start(bool render = true);
 
     std::string get_frame(Player_t viewer_t);
+    static void clear_screen();
     void render(Player_t viewer_t);
     void render();
     void throw_dice(bool render = true);
@@ -68,4 +69,4 @@ public:
     Player* get_winner();
 };
 
-#endif //BACKGAMMON_BACKGAMMON_H
+#endif //BACKGAMMON_H
