@@ -3,16 +3,22 @@
 
 int main() {
     std::string data;
-    ClientSocket clientSocket("localhost", 5555);
+    ClientSocket clientSocket;
+    clientSocket.create();
+    clientSocket.init_host("localhost", 5555);
+
     std::cout << "Connecting...\n";
     if (clientSocket.connect()) {
         std::cout << "Connected\n";
 
-        clientSocket.on_message_callback = [](const std::string &data) {
-            std::cout << "Message from socket: " << data << std::endl;
+        clientSocket.on_message = [](const std::string &data) {
+            std::cout << "\nMessage from socket: " << data << "\n";
+        };
+        clientSocket.on_disconnect = []() {
+            std::cout << "\nDisconnect" << "\n";
         };
 
-        clientSocket.wait_message(200, THREAD::DETACH);
+        clientSocket.wait_message(200).detach();
 
         while (true) {
             std::cin >> data;
@@ -20,7 +26,7 @@ int main() {
                 break;
             }
             if (clientSocket.send(data)) {
-                std::cout << "Sent!\n";
+                std::cout << "\nSent!\n";
             }
         }
     }

@@ -10,10 +10,8 @@
 #include <cstdint>
 #include <string>
 #include <functional>
+#include <thread>
 #include "../../game/type/types.h"
-
-typedef std::function<void(const std::string& data)> message_callback;
-typedef std::function<void()> disconnect_callback;
 
 class ClientSocket {
 private:
@@ -22,16 +20,18 @@ private:
     sockaddr_in server_address{};
     hostent *server;
 
-    THREAD ON_MESSAGE_THREAD_RUN = THREAD::DETACH;
 public:
-    message_callback on_message_callback;
-    disconnect_callback on_disconnect_callback;
+    message_callback on_message;
+    disconnect_callback on_disconnect;
 
-    ClientSocket(const std::string& hostname, uint16_t port);
     ~ClientSocket();
+
+    void create();
+    void init_host(const std::string& hostname, uint16_t port);
+
     bool connect();
-    [[nodiscard]] bool send(const std::string& data) const;
-    void wait_message(size_t buffer_size, THREAD on_message_thread_run);
+    void send(const std::string& data) const;
+    std::thread wait_message(size_t buffer_size);
     void close() const;
 };
 

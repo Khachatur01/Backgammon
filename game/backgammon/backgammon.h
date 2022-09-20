@@ -5,6 +5,7 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <functional>
 
 class Backgammon {
 private:
@@ -31,8 +32,8 @@ private:
 
     Player white_player = Player(Backgammon::PIPS_COUNT, Backgammon::WHITE, Player_t::WHITE);
     Player black_player = Player(Backgammon::PIPS_COUNT, Backgammon::BLACK, Player_t::BLACK);
-    Player *player = nullptr;
-    Player *winner = nullptr;
+    Player* player = nullptr;
+    Player* winner = nullptr;
     uint8_t selected_peace = Backgammon::PIPS_COUNT; /* no selection */
     std::vector<uint8_t> available_pips_for_selected_peace;
     std::vector<uint8_t> all_available_pips;
@@ -51,21 +52,24 @@ private:
     static std::string repeat(const std::string& text, uint8_t count);
 
 public:
+    Player_t viewer = Player_t::SWITCH;
     bool auto_commit = false;
 
     Backgammon();
-    void start(bool render = true);
+    void start(bool render = true, Player_t viewer = Player_t::WHITE);
+    void set_player(Player_t starter_player);
 
-    std::string get_frame(Player_t viewer_t);
     static void clear_screen();
+    std::string get_frame(Player_t viewer_t);
     void render(Player_t viewer_t);
     void render();
-    void throw_dice(bool render = true);
+    void throw_dice(bool render = true, const dices_t* force_dices = nullptr);
     bool take_peace(uint8_t peace_index, bool render = true);
     bool release_peace(bool render = true);
     bool move_to(uint8_t pip, bool render = true);
     bool commit_moves(bool render = true);
     void cancel_moves(bool render = true);
+    Player* get_player();
     Player* get_winner();
 };
 

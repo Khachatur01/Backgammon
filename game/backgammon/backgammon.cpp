@@ -266,8 +266,16 @@ Backgammon::Backgammon() {
     this->black_player.opponent = &this->white_player;
 }
 
-void Backgammon::start(bool render) {
-    this->player = &this->white_player;
+void Backgammon::start(bool render, Player_t viewer) {
+    /* define player */
+    switch (viewer) {
+        case Player_t::WHITE:
+            this->player = &this->white_player;
+            break;
+        case Player_t::BLACK:
+            this->player = &this->black_player;
+            break;
+    }
     do {
         this->throw_dice(render);
     } while (this->dices.first == this->dices.second);
@@ -276,7 +284,20 @@ void Backgammon::start(bool render) {
         this->render();
     }
 }
+void Backgammon::set_player(Player_t starter_player) {
+    switch (starter_player) {
+        case Player_t::WHITE:
+            this->player = &this->white_player;
+            break;
+        case Player_t::BLACK:
+            this->player = &this->black_player;
+            break;
+    }
+}
 
+void Backgammon::clear_screen() {
+    system("clear"); /* make cross-platform */
+}
 std::string Backgammon::get_frame(Player_t viewer_t) {
     return "Move " + Backgammon::RIGHT + " " + (this->player != nullptr ? this->player->PEACE : "") + '\n' +
            Backgammon::render_frame(
@@ -288,19 +309,16 @@ std::string Backgammon::get_frame(Player_t viewer_t) {
         this->all_available_pips
     );
 }
-void Backgammon::clear_screen() {
-    system("clear"); /* make cross-platform */
-}
 void Backgammon::render(Player_t viewer_t) {
     Backgammon::clear_screen();
     std::cout << this->get_frame(viewer_t);
 }
 void Backgammon::render() {
     Backgammon::clear_screen();
-    std::cout << this->get_frame(this->player->TYPE);
+    std::cout << this->get_frame(viewer == Player_t::SWITCH ? this->player->TYPE : viewer);
 }
 
-void Backgammon::throw_dice(bool render) {
+void Backgammon::throw_dice(bool render, const dices_t* force_dices) {
     this->all_available_pips.clear();
     for (uint8_t i = 0; i < Backgammon::DICE_ROTATE_COUNT; ++i) {
 
@@ -311,9 +329,17 @@ void Backgammon::throw_dice(bool render) {
         this->dices.first = uniform_dist(engine);
         this->dices.second = uniform_dist(engine);
 
-        this->render();
+        if (render) {
+            this->render();
+        }
+
         usleep(Backgammon::THROW_DELAY * 1000);
     }
+    if (force_dices != nullptr) {
+        this->dices.first = force_dices->first;
+        this->dices.second = force_dices->second;
+    }
+
     if (player != nullptr) {
         if (!this->player->can_bear_off) { /* if player can't bear off before commit, check if it is possible after commit */
             this->player->can_bear_off = true;
@@ -330,6 +356,7 @@ void Backgammon::throw_dice(bool render) {
         if (render) {
             this->render();
         }
+
     }
 }
 
@@ -355,6 +382,7 @@ bool Backgammon::release_peace(bool render) {
     if (render) {
         this->render();
     }
+
 }
 bool Backgammon::take_peace(uint8_t peace_index, bool render) {
     peace_index -= 'a';
@@ -373,6 +401,7 @@ bool Backgammon::take_peace(uint8_t peace_index, bool render) {
         if (render) {
             this->render();
         }
+
         return true;
     }
     return false;
@@ -437,8 +466,12 @@ void Backgammon::cancel_moves(bool render) {
     if (render) {
         this->render();
     }
+
 }
 
 Player* Backgammon::get_winner() {
     return this->winner;
+}
+Player* Backgammon::get_player() {
+    return this->player;
 }
