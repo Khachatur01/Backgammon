@@ -4,7 +4,7 @@
 /* private */
 
 /* public */
-BackgammonServer::BackgammonServer() : serverSocket(1) {
+BackgammonServer::BackgammonServer() : serverSocket(1), eventHandler(false, Player_t::WHITE) {
     this->serverSocket.on_connect = [&](Client client) {
         this->players_map[Player_t::BLACK] = client; /* second player is black */
     };
@@ -13,10 +13,7 @@ BackgammonServer::BackgammonServer() : serverSocket(1) {
     };
 
     this->serverSocket.on_message_from = [&](const std::string &data, Client from) {
-        if (data == "throw") {
-            dices_t force_dices = std::make_pair(5, 6);
-            this->backgammon.throw_dice(true, &force_dices);
-        }
+        this->eventHandler.handle(data);
     };
 }
 
@@ -27,23 +24,23 @@ void BackgammonServer::run(uint16_t port) {
 
     this->serverSocket.wait_connection().join(); /* wait for second player to connect */
 
-    /* when second player is connected, start game */
-    this->backgammon.auto_commit = false;
-    this->backgammon.viewer = Player_t::WHITE;
-    this->backgammon.start();
+    /* start game when second player is connected */
+    this->eventHandler.get_backgammon()->start();
 
     std::string enter;
-    switch (this->backgammon.get_player()->TYPE) {
-        case Player_t::WHITE:
+    switch (this->eventHandler.get_backgammon()->get_player()->TYPE) {
+        case Player_t::WHITE: {
             std::cout << "Input something to throw dices: ";
             std::cin >> enter;
-            this->backgammon.throw_dice();
-            this->serverSocket.send_to(this->players_map[Player_t::BLACK], "throw");
+            dices_t dices = this->eventHandler.get_backgammon()->throw_dice();
+            this->serverSocket.send_to(this->players_map[Player_t::BLACK], throw_dices(dices.first, dices.second).to_string());
             break;
-        case Player_t::BLACK:
+        }
+        case Player_t::BLACK: {
             std::cout << "Opponent will start...\n ";
-            this->serverSocket.send_to(this->players_map[Player_t::BLACK], "start");
+            this->serverSocket.send_to(this->players_map[Player_t::BLACK], start(Player_t::BLACK).to_string());
             break;
+        }
         default:
             break;
     }

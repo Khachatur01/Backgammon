@@ -3,10 +3,11 @@
 
 #include "../../../backgammon/backgammon.h"
 #include "../../../../socket/client/ClientSocket.h"
+#include "../event_handler.cpp"
 
 class BackgammonClient {
 private:
-    Backgammon backgammon;
+    EventHandler eventHandler;
     ClientSocket clientSocket;
 public:
     BackgammonClient();

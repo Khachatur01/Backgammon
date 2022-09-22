@@ -7,10 +7,11 @@
 #include "../../../../socket/server/ServerSocket.h"
 #include "../../../backgammon/backgammon.h"
 #include "../client/BackgammonClient.h"
+#include "../event_handler.cpp"
 
 class BackgammonServer {
 private:
-    Backgammon backgammon;
+    EventHandler eventHandler;
     ServerSocket serverSocket;
     std::unordered_map<Player_t, Client> players_map;
 

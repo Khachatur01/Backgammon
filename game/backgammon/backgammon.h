@@ -55,15 +55,22 @@ public:
     Player_t viewer = Player_t::SWITCH;
     bool auto_commit = false;
 
-    Backgammon();
-    void start(bool render = true, Player_t viewer = Player_t::WHITE);
-    void set_player(Player_t starter_player);
+    /**
+     * @param auto_commit automatically commit if there is no possible moves
+     * @param render_for player who will view board, if render_for is SWITCH, then rotate board for every player
+     * */
+    Backgammon(bool auto_commit, Player_t render_for);
+    /**
+     * @param starter player who will start game, if starter is SWITCH, starter will defined by dices
+     * @param render true / false
+     * */
+    void start(Player_t starter = Player_t::SWITCH, bool render = true);
 
     static void clear_screen();
     std::string get_frame(Player_t viewer_t);
     void render(Player_t viewer_t);
     void render();
-    void throw_dice(bool render = true, const dices_t* force_dices = nullptr);
+    dices_t throw_dice(bool render = true, const dices_t* force_dices = nullptr);
     bool take_peace(uint8_t peace_index, bool render = true);
     bool release_peace(bool render = true);
     bool move_to(uint8_t pip, bool render = true);
