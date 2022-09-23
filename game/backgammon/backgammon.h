@@ -52,14 +52,14 @@ private:
     static std::string repeat(const std::string& text, uint8_t count);
 
 public:
-    Player_t viewer = Player_t::SWITCH;
-    bool auto_commit = false;
+    bool auto_commit;
+    Player_t viewer;
 
     /**
      * @param auto_commit automatically commit if there is no possible moves
      * @param render_for player who will view board, if render_for is SWITCH, then rotate board for every player
      * */
-    Backgammon(bool auto_commit, Player_t render_for);
+    explicit Backgammon(bool auto_commit = false, Player_t render_for = Player_t::SWITCH);
     /**
      * @param starter player who will start game, if starter is SWITCH, starter will defined by dices
      * @param render true / false

@@ -3,7 +3,7 @@
 
 #include "../../../backgammon/backgammon.h"
 #include "../../../../socket/client/ClientSocket.h"
-#include "../event_handler.cpp"
+#include "../server/event.cpp"
 
 class BackgammonClient {
 private:

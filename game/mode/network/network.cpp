@@ -4,17 +4,17 @@
 #include "client/BackgammonClient.h"
 
 void create_room() {
-    uint16_t port;
-    std::cout << "Run server on port: ";
-    std::cin >> port;
-    BackgammonServer server;
-    try {
-        server.run(port); /* wait until game over */
-    } catch (socket_creation_exception &e) {
-        std::cout << e.what() << std::endl;
-    } catch (socket_bind_exception &e) {
-        std::cout << e.what() << std::endl;
-    }
+//    uint16_t port;
+//    std::cout << "Run server on port: ";
+//    std::cin >> port;
+//    BackgammonServer server;
+//    try {
+//        server.run(port); /* wait until game over */
+//    } catch (socket_creation_exception &e) {
+//        std::cout << e.what() << std::endl;
+//    } catch (socket_bind_exception &e) {
+//        std::cout << e.what() << std::endl;
+//    }
 }
 void connect_to_room() {
     std::string host;

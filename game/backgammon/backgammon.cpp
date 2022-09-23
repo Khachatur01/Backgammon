@@ -268,6 +268,7 @@ Backgammon::Backgammon(bool auto_commit, Player_t render_for) {
     this->viewer = render_for;
 }
 
+/* starter is default switch */
 void Backgammon::start(Player_t starter, bool render) {
     do {
         this->throw_dice(render);

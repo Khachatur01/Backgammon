@@ -1,49 +1,83 @@
 #include <iostream>
+#include <utility>
 #include "BackgammonServer.h"
 
 /* private */
-
+Room::Room(const std::string& password) {
+    this->password = password;
+}
 /* public */
-BackgammonServer::BackgammonServer() : serverSocket(1), eventHandler(false, Player_t::WHITE) {
+
+
+/* private */
+/* public */
+BackgammonServer::BackgammonServer() : serverSocket(1) {
     this->serverSocket.on_connect = [&](Client client) {
-        this->players_map[Player_t::BLACK] = client; /* second player is black */
+        this->serverSocket.wait_message_from(client, 200).detach();
     };
     this->serverSocket.on_disconnect = [&](Client client) {
         std::cout << client.socket_fd << " is disconnected\n";
     };
 
     this->serverSocket.on_message_from = [&](const std::string &data, Client from) {
-        this->eventHandler.handle(data);
+        this->on_event(data);
     };
 }
 
-void BackgammonServer::run(uint16_t port) {
+std::thread BackgammonServer::run(uint16_t port, uint64_t max_rooms) {
     this->serverSocket.create();
     this->serverSocket.bind(port);
-    this->serverSocket.listen(1);
+    this->serverSocket.listen(max_rooms * 2); /* on every room can connect to player */
 
-    this->serverSocket.wait_connection().join(); /* wait for second player to connect */
+    return this->serverSocket.wait_connection();
 
-    /* start game when second player is connected */
-    this->eventHandler.get_backgammon()->start();
+}
 
-    std::string enter;
-    switch (this->eventHandler.get_backgammon()->get_player()->TYPE) {
-        case Player_t::WHITE: {
-            std::cout << "Input something to throw dices: ";
-            std::cin >> enter;
-            dices_t dices = this->eventHandler.get_backgammon()->throw_dice();
-            this->serverSocket.send_to(this->players_map[Player_t::BLACK], throw_dices(dices.first, dices.second).to_string());
+void BackgammonServer::on_event(const std::string& event) {
+    this->on_event(event::parse(event));
+}
+void BackgammonServer::on_event(event* event) {
+    Room room = this->rooms.at(event->room);
+    if (event->password != room.password) {
+        return;
+    }
+
+    switch (event->id) {
+        case CREATE_ROOM: {
             break;
         }
-        case Player_t::BLACK: {
-            std::cout << "Opponent will start...\n ";
-            this->serverSocket.send_to(this->players_map[Player_t::BLACK], start(Player_t::BLACK).to_string());
+        case CONNECT_ROOM: {
+            break;
+        }
+        case THROW_DICES: {
+            auto* throw_dices_event = dynamic_cast<throw_dices*>(event);
+            dices_t force_dices = std::make_pair(throw_dices_event->first, throw_dices_event->first);
+            room.backgammon.throw_dice(true, &force_dices);
+            break;
+        }
+        case TAKE_PEACE: {
+            auto* take_peace_event = dynamic_cast<take_peace*>(event);
+            room.backgammon.take_peace(take_peace_event->pip, true);
+            break;
+        }
+        case MOVE_TO: {
+            auto* move_to_event = dynamic_cast<move_to*>(event);
+            room.backgammon.take_peace(move_to_event->pip, true);
+            break;
+        }
+        case CANCEL_MOVES: {
+            room.backgammon.cancel_moves();
+            break;
+        }
+        case RELEASE_PEACE: {
+            room.backgammon.release_peace();
+            break;
+        }
+        case COMMIT_MOVES: {
+            room.backgammon.commit_moves();
             break;
         }
         default:
             break;
     }
-
-    this->serverSocket.wait_message_from(this->players_map[Player_t::BLACK], 200).join();
 }
