@@ -2,13 +2,13 @@
 #define BACKGAMMON_CLIENT_H
 
 #include "../../../backgammon/backgammon.h"
-#include "../../../../socket/client/ClientSocket.h"
+#include "../../../../socket/client/Client.h"
 #include "../event/Event.h"
 
 class BackgammonClient {
 private:
     Backgammon* backgammon;
-    ClientSocket* clientSocket;
+    Socket::Client* clientSocket;
     Player_t me;
 
     std::string host;

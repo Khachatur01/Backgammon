@@ -4,13 +4,13 @@
 #include <functional>
 #include <netinet/in.h>
 
-struct Client {
+struct Client_t {
     int socket_fd;
     sockaddr_in address;
-    bool operator==(const Client& client) const {
+    bool operator==(const Client_t& client) const {
         return client.socket_fd == this->socket_fd;
     }
-    bool operator!=(const Client& client) const {
+    bool operator!=(const Client_t& client) const {
         return client.socket_fd != this->socket_fd;
     }
 };
@@ -38,8 +38,8 @@ typedef std::pair<uint8_t, uint8_t> move_t; /* first: from_pip, second: to_pip *
 typedef std::function<void(const std::string& data)> message_callback;
 typedef std::function<void()> disconnect_callback;
 
-typedef std::function<void(const std::string& data, Client from)> message_from_callback;
-typedef std::function<void(Client client)> disconnect_from_callback;
-typedef std::function<void(Client client)> connect_to_callback;
+typedef std::function<void(const std::string& data, Client_t from)> message_from_callback;
+typedef std::function<void(Client_t client)> disconnect_from_callback;
+typedef std::function<void(Client_t client)> connect_to_callback;
 
 #endif //BACKGAMMON_TYPES_H

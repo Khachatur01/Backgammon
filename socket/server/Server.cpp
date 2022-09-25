@@ -1,4 +1,4 @@
-#include "ServerSocket.h"
+#include "Server.h"
 #include "../exception/socket_exception.h"
 #include <thread>
 #include <cstring>
@@ -6,20 +6,20 @@
 
 /* private */
 /* public */
-ServerSocket::ServerSocket(uint8_t max_connections) {
+Socket::Server::Server(uint8_t max_connections) {
     this->socket_fd = 0;
     this->max_connections = max_connections;
 }
-ServerSocket::~ServerSocket() {
+Socket::Server::~Server() {
     this->close();
 }
-void ServerSocket::create() {
+void Socket::Server::create() {
     this->socket_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (this->socket_fd < 0) {
         throw socket_creation_exception();
     }
 }
-void ServerSocket::bind(uint16_t port) {
+void Socket::Server::bind(uint16_t port) {
     bzero((char *) &address, sizeof(address));
     this->address.sin_family = AF_INET;
     this->address.sin_addr.s_addr = INADDR_ANY;
@@ -32,14 +32,14 @@ void ServerSocket::bind(uint16_t port) {
         throw socket_bind_exception(port);
     }
 }
-void ServerSocket::listen(uint8_t backlog_queue_size) const {
+void Socket::Server::listen(uint8_t backlog_queue_size) const {
     ::listen(this->socket_fd, backlog_queue_size);
 }
 
-std::thread ServerSocket::wait_connection() {
+std::thread Socket::Server::wait_connection() {
     return std::thread([this]() {
         while (this->max_connections == 0 || this->clients.size() < this->max_connections) { /* if max connections == 0, listen unlimited connections */
-            Client client{};
+            Client_t client{};
             socklen_t client_len = sizeof(client.address);
             client.socket_fd = ::accept(this->socket_fd, (sockaddr *) &client.address, &client_len);
             this->mutex.lock();
@@ -49,12 +49,12 @@ std::thread ServerSocket::wait_connection() {
         }
     });
 }
-std::thread ServerSocket::wait_message_from(Client client, size_t buffer_size) {
+std::thread Socket::Server::wait_message_from(Client_t client, size_t buffer_size) {
     char *buffer = new char[buffer_size];
     return std::thread([this, client, buffer, buffer_size]() {
         while (true) {
             bzero(buffer, buffer_size);
-            int64_t read = ::read(client.socket_fd, buffer, buffer_size);
+            int64_t read = ::recv(client.socket_fd, buffer, buffer_size, 0);
             if (read > 0) {
                 this->on_message_from(buffer, client);
             } else if (read == 0) { /* when receiving 0, it means that client is disconnected. no need to listen messages from that client */
@@ -68,21 +68,21 @@ std::thread ServerSocket::wait_message_from(Client client, size_t buffer_size) {
     });
 }
 
-void ServerSocket::broadcast(const std::string& data) const {
-    for (Client client: this->clients) {
+void Socket::Server::broadcast(const std::string& data) const {
+    for (Client_t client: this->clients) {
         std::thread([client, data]() {
             ::send(client.socket_fd, data.c_str(), data.size(), 0);
         }).detach();
     }
 }
-void ServerSocket::send_to(Client client, const std::string &data) const {
+void Socket::Server::send_to(Client_t client, const std::string &data) const {
     ::send(client.socket_fd, data.c_str(), data.size(), 0);
 }
 
-void ServerSocket::close() const {
+void Socket::Server::close() const {
     shutdown(this->socket_fd, SHUT_RDWR);
     ::close(this->socket_fd);
-    for (Client client: this->clients) {
+    for (Client_t client: this->clients) {
         shutdown(client.socket_fd, SHUT_RDWR);
         ::close(client.socket_fd);
     }

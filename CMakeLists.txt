@@ -5,8 +5,8 @@ project(Backgammon)
 set(CMAKE_CXX_STANDARD 20)
 
 add_library(socket_exception STATIC socket/exception/socket_exception.cpp)
-add_library(server_socket STATIC socket/server/ServerSocket.cpp)
-add_library(client_socket STATIC socket/client/ClientSocket.cpp)
+add_library(server_socket STATIC socket/server/Server.cpp)
+add_library(client_socket STATIC socket/client/Client.cpp)
 add_library(backgammon_logic STATIC game/backgammon/backgammon.cpp)
 add_library(player STATIC game/player/player.cpp)
 #[[ network ]]

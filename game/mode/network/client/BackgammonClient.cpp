@@ -117,7 +117,7 @@ void BackgammonClient::on_event(event::Event* event) {
 
 /* public */
 BackgammonClient::BackgammonClient(): me(Player_t::SWITCH) {
-    this->clientSocket = new ClientSocket();
+    this->clientSocket = new Socket::Client();
     this->clientSocket->on_message = [&](const std::string &data) {
         this->on_event(data);
     };

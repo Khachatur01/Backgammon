@@ -1,23 +1,23 @@
 #include <thread>
 #include <cstring>
 #include <iostream>
-#include "ClientSocket.h"
+#include "Client.h"
 #include "../exception/socket_exception.h"
 
 /* private */
 
 /* public */
-ClientSocket::~ClientSocket() {
+Socket::Client::~Client() {
     this->close();
 }
 
-void ClientSocket::create() {
+void Socket::Client::create() {
     this->socket_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (this->socket_fd < 0) {
         throw socket_creation_exception();
     }
 }
-void ClientSocket::init_host(const std::string& hostname, uint16_t port) {
+void Socket::Client::init_host(const std::string& hostname, uint16_t port) {
     this->server = gethostbyname(hostname.c_str());
     if (this->server == nullptr) {
         throw server_init_exception();
@@ -35,17 +35,17 @@ void ClientSocket::init_host(const std::string& hostname, uint16_t port) {
     setsockopt(this->socket_fd, SOL_SOCKET, SO_REUSEADDR, &one, (socklen_t)sizeof one);
 }
 
-bool ClientSocket::connect() {
+bool Socket::Client::connect() {
     if (::connect(this->socket_fd, (sockaddr *) &this->server_address, sizeof(this->server_address)) < 0) {
         return false;
     }
     return true;
 }
-void ClientSocket::send(const std::string& data) const {
+void Socket::Client::send(const std::string& data) const {
     ::send(this->socket_fd, data.c_str(), data.size(), 0);
 }
 
-std::thread ClientSocket::wait_message(size_t buffer_size) {
+std::thread Socket::Client::wait_message(size_t buffer_size) {
     char *buffer = new char[buffer_size];
 
     return std::thread([this, buffer, buffer_size]() {
@@ -61,7 +61,7 @@ std::thread ClientSocket::wait_message(size_t buffer_size) {
         }
     });
 }
-void ClientSocket::close() const {
+void Socket::Client::close() const {
     ::shutdown(this->socket_fd, SHUT_RDWR);
     ::close(this->socket_fd);
 }
