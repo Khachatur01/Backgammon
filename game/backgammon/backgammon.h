@@ -61,7 +61,7 @@ public:
      * */
     explicit Backgammon(bool auto_commit = false, Player_t render_for = Player_t::SWITCH);
     /**
-     * @param starter player who will start game, if starter is SWITCH, starter will defined by dices
+     * @param starter player who will Start game, if starter is SWITCH, starter will defined by dices
      * @param render true / false
      * */
     void start(Player_t starter = Player_t::SWITCH, bool render = true);
@@ -72,7 +72,7 @@ public:
     void render();
     dices_t throw_dice(bool render = true, const dices_t* force_dices = nullptr);
     bool take_peace(uint8_t peace_index, bool render = true);
-    bool release_peace(bool render = true);
+    void release_peace(bool render = true);
     bool move_to(uint8_t pip, bool render = true);
     bool commit_moves(bool render = true);
     void cancel_moves(bool render = true);

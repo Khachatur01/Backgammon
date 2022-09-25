@@ -3,15 +3,32 @@
 
 #include "../../../backgammon/backgammon.h"
 #include "../../../../socket/client/ClientSocket.h"
-#include "../server/event.cpp"
+#include "../event/Event.h"
 
 class BackgammonClient {
 private:
-    EventHandler eventHandler;
-    ClientSocket clientSocket;
+    Backgammon* backgammon;
+    ClientSocket* clientSocket;
+    Player_t me;
+
+    std::string host;
+    uint16_t port;
+    std::string room_name;
+    std::string room_password;
+
+    void on_play();
+    void on_event(const std::string& message);
+    void on_event(event::Event* event);
 public:
     BackgammonClient();
-    void connect(const std::basic_string<char> &hostname, uint16_t port);
+    void set_server(const std::basic_string<char> &hostname, uint16_t port);
+
+    void create_room(const std::string& room, const std::string& password);
+    std::thread connect_room(const std::string& room, const std::string& password);
+    std::thread create_room_and_connect(const std::string &room, const std::string &password);
+
+    [[nodiscard]] std::string get_host() const;
+    [[nodiscard]] uint16_t get_port() const;
 };
 
 #endif //BACKGAMMON_CLIENT_H

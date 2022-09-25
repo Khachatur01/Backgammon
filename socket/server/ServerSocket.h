@@ -15,9 +15,9 @@ private:
     sockaddr_in address{};
     std::list<Client> clients;
     std::mutex mutex;
-    uint8_t max_connections;
 
 public:
+    uint8_t max_connections;
     connect_to_callback on_connect;
     disconnect_from_callback on_disconnect;
     message_from_callback on_message_from;

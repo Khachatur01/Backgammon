@@ -363,7 +363,7 @@ dices_t Backgammon::throw_dice(bool render, const dices_t* force_dices) {
     return this->dices;
 }
 
-bool Backgammon::release_peace(bool render) {
+void Backgammon::release_peace(bool render) {
     this->selected_peace = Backgammon::PIPS_COUNT;
     this->available_pips_for_selected_peace = this->player->get_available_pips_for_peace(
             this->selected_peace,
