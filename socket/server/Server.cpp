@@ -87,3 +87,6 @@ void Socket::Server::close() const {
         ::close(client.socket_fd);
     }
 }
+void Socket::Server::close(Client_t client) const {
+    ::close(client.socket_fd);
+}

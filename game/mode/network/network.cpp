@@ -1,8 +1,6 @@
 #include <iostream>
 #include "client/BackgammonClient.h"
 #include "../../../socket/exception/socket_exception.h"
-#include <thread>
-#include <chrono>
 
 void choose_server(BackgammonClient& client) {
     std::string host;
@@ -53,10 +51,13 @@ void network_mode() {
 
     do {
         Backgammon::clear_screen();
+        std::cout << "Network mode.\n";
         if (!client.get_host().empty()) {
             std::cout << "Host -> " << client.get_host() << ':' << client.get_port() << '\n';
+        } else {
+            std::cout << "Choose host at first...\n";
         }
-        std::cout << "Network mode.\n";
+
         std::cout << "<) Back\n";
         std::cout << "a) Choose server\n";
         std::cout << "b) Create a room\n";
@@ -70,18 +71,20 @@ void network_mode() {
             break;
         }
 
+        Backgammon::clear_screen();
         switch (room_type) {
             case 'a':
-                Backgammon::clear_screen();
                 choose_server(client);
                 break;
             case 'b':
-                Backgammon::clear_screen();
-                create_room(client); /* create room, set_server to that room and wait for game over */
+                if (!client.get_host().empty()) {
+                    create_room(client);
+                }
                 break;
             case 'c':
-                Backgammon::clear_screen();
-                connect_to_room(client);
+                if (!client.get_host().empty()) {
+                    connect_to_room(client);
+                }
                 break;
             default:
                 break;

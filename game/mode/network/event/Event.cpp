@@ -102,11 +102,32 @@ event::CreateRoomAndConnect::CreateRoomAndConnect() : event::Event(Event_t::CREA
 event::CreateRoomAndConnect::CreateRoomAndConnect(const std::string& room, const std::string& password)
     : event::Event(Event_t::CREATE_ROOM_AND_CONNECT, room, password) {}
 
+/* GameOver */
+event::GameOver::GameOver() : event::Event(Event_t::GAME_OVER) {}
+event::GameOver::GameOver(const std::string& room, const std::string& password, Player_t winner)
+    : event::Event(Event_t::GAME_OVER, room, password), winner(winner) {}
+std::string event::GameOver::to_string() {
+    return event::Event::to_string() + sep + std::to_string(this->winner);
+}
+void event::GameOver::parse(std::vector<std::string> fields) {
+    event::Event::parse(fields);
+    this->winner = static_cast<Player_t>(std::stoi(fields[3]));
+}
+
+/* RoomExist */
+event::RoomExists::RoomExists() : event::Event(Event_t::ROOM_EXISTS) {}
+event::RoomExists::RoomExists(const std::string& room, const std::string& password)
+        : event::Event(Event_t::ROOM_EXISTS, room, password) {}
+
+/* IncorrectPassword */
+event::IncorrectPassword::IncorrectPassword() : event::Event(Event_t::INCORRECT_PASSWORD) {}
+event::IncorrectPassword::IncorrectPassword(const std::string& room, const std::string& password)
+        : event::Event(Event_t::INCORRECT_PASSWORD, room, password) {}
+
 /* SetMyself */
 event::SetMyself::SetMyself() : event::Event(Event_t::SET_MYSELF) {}
 event::SetMyself::SetMyself(const std::string& room, const std::string& password, Player_t me)
-    : event::Event(Event_t::SET_MYSELF, room, password), me(me) {
-}
+    : event::Event(Event_t::SET_MYSELF, room, password), me(me) {}
 std::string event::SetMyself::to_string() {
     return event::Event::to_string() + sep + std::to_string(this->me);
 }

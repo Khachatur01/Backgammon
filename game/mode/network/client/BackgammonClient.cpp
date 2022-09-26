@@ -3,10 +3,6 @@
 
 /* private */
 void BackgammonClient::on_play() {
-    std::string enter;
-    std::cout << "Input something to throw dices: ";
-    std::cin >> enter;
-
     dices_t dices = this->backgammon->throw_dice();
     this->clientSocket->send(event::ThrowDices(this->room_name, this->room_password, dices.first, dices.second).to_string());
 
@@ -52,6 +48,7 @@ void BackgammonClient::on_play() {
     }
 
     /* game over */
+    this->clientSocket->send(event::GameOver(this->room_name, this->room_password, backgammon->get_winner()->TYPE).to_string());
 
     finish_playing:
     return;
@@ -62,10 +59,21 @@ void BackgammonClient::on_event(const std::string& event) {
 }
 void BackgammonClient::on_event(event::Event* event) {
     switch (event->id) {
+        case ROOM_EXISTS: {
+            std::cout << "Room '" << event->room << "' exits\n";
+            this->clientSocket->close();
+            break;
+        }
+        case INCORRECT_PASSWORD: {
+            std::cout << "'" << event->password << "' password for '" << event->password << "' room is incorrect\n";
+            this->clientSocket->close();
+            break;
+        }
         case Event_t::SET_MYSELF: {
             auto* set_myself = dynamic_cast<event::SetMyself*>(event);
             this->me = set_myself->me;
-            std::cout << "Set myself\n";
+            std::cout << "Connected to room '" << event->room << "'\n";
+            std::cout << "Wait opponent to connect...'\n";
             break;
         }
         case Event_t::START: {
@@ -77,6 +85,8 @@ void BackgammonClient::on_event(event::Event* event) {
             if (start->starter == this->me) {
                 this->on_play();
             }
+            std::cout << "Wait opponent to play...\n";
+
             break;
         }
         case Event_t::THROW_DICES: {
@@ -88,13 +98,11 @@ void BackgammonClient::on_event(event::Event* event) {
         case Event_t::TAKE_PEACE: {
             auto* take_peace = dynamic_cast<event::TakePeace*>(event);
             this->backgammon->take_peace( take_peace->pip, true);
-
             break;
         }
         case Event_t::MOVE_TO: {
             auto* move_to = dynamic_cast<event::MoveTo*>(event);
             this->backgammon->move_to(move_to->pip, true);
-
             break;
         }
         case Event_t::CANCEL_MOVES: {
@@ -108,6 +116,7 @@ void BackgammonClient::on_event(event::Event* event) {
         case Event_t::COMMIT_MOVES: {
             this->backgammon->commit_moves();
             this->on_play();
+            std::cout << "Wait opponent to play...\n";
             break;
         }
         default:
@@ -117,19 +126,24 @@ void BackgammonClient::on_event(event::Event* event) {
 
 /* public */
 BackgammonClient::BackgammonClient(): me(Player_t::SWITCH) {
+    this->backgammon = nullptr;
+    this->port = 5555;
+
     this->clientSocket = new Socket::Client();
     this->clientSocket->on_message = [&](const std::string &data) {
         this->on_event(data);
     };
     this->clientSocket->on_disconnect = []() {
-
+        std::cout << "Server disconnected...\n";
     };
 
     this->clientSocket->create();
 }
 
-void BackgammonClient::set_server(const std::basic_string<char> &hostname, uint16_t port) {
-    this->clientSocket->init_host(hostname, port);
+void BackgammonClient::set_server(const std::basic_string<char> &hostname, uint16_t port_number) {
+    this->host = hostname;
+    this->port = port_number;
+    this->clientSocket->init_host(hostname, port_number);
     this->clientSocket->connect();
 }
 
@@ -139,15 +153,15 @@ void BackgammonClient::create_room(const std::string& room, const std::string& p
 
 std::thread BackgammonClient::connect_room(const std::string& room, const std::string& password) {
     this->clientSocket->send(event::ConnectRoom(room, password).to_string());
-    this->room_name += room;
-    this->room_password += password;
+    this->room_name = room;
+    this->room_password = password;
     return this->clientSocket->wait_message(200);
 }
 
 std::thread BackgammonClient::create_room_and_connect(const std::string &room, const std::string &password) {
     this->clientSocket->send(event::CreateRoomAndConnect(room, password).to_string());
-    this->room_name += room;
-    this->room_password += password;
+    this->room_name = room;
+    this->room_password = password;
     return this->clientSocket->wait_message(200);
 }
 

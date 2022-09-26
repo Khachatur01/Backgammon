@@ -6,7 +6,8 @@ int main() {
     uint16_t port;
     uint64_t max_rooms;
 
-    std::cout << "Welcome to server creator for backgammon game\n";
+    std::cout << "Welcome to server creator for backgammon game\n\n";
+
     std::cout << "Max rooms(0 for infinity): ";
     std::cin >> max_rooms;
     port_input:
@@ -15,15 +16,11 @@ int main() {
 
     BackgammonServer backgammonServer;
     try {
-        backgammonServer.run(port, max_rooms).detach();
+        backgammonServer.run(port, max_rooms).join();
     } catch (socket_creation_exception &e) {
         std::cout << e.what() << std::endl;
     } catch (socket_bind_exception &e) {
         std::cout << e.what() << std::endl;
         goto port_input;
     }
-
-    char c;
-    std::cout << "Input anything to stop server: ";
-    std::cin >> c;
 }

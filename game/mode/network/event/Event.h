@@ -10,6 +10,9 @@ enum Event_t {
     CREATE_ROOM,
     CONNECT_ROOM,
     CREATE_ROOM_AND_CONNECT,
+    ROOM_EXISTS,
+    INCORRECT_PASSWORD,
+    GAME_OVER,
     SET_MYSELF,
     START,
     THROW_DICES,
@@ -43,6 +46,22 @@ namespace event {
     struct CreateRoomAndConnect : public Event {
         CreateRoomAndConnect();
         CreateRoomAndConnect(const std::string& room, const std::string& password);
+    };
+    struct RoomExists : public Event {
+        RoomExists();
+        RoomExists(const std::string& room, const std::string& password);
+    };
+    struct IncorrectPassword : public Event {
+        IncorrectPassword();
+        IncorrectPassword(const std::string& room, const std::string& password);
+    };
+    struct GameOver : public Event {
+        Player_t winner = Player_t::SWITCH;
+
+        GameOver();
+        GameOver(const std::string& room, const std::string& password, Player_t winner);
+        std::string to_string() override;
+        void parse(std::vector<std::string> fields) override;
     };
     struct SetMyself : public Event {
         Player_t me = Player_t::SWITCH;
