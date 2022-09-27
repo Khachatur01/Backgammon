@@ -70,7 +70,8 @@ public:
     std::string get_frame(Player_t viewer_t);
     void render(Player_t viewer_t);
     void render();
-    dices_t throw_dice(bool render = true, const dices_t* force_dices = nullptr);
+    dices_t throw_dice(const dices_t* force_dices = nullptr, bool render = true);
+    void reset_dices(bool render = true);
     bool take_peace(uint8_t peace_index, bool render = true);
     void release_peace(bool render = true);
     bool move_to(uint8_t pip, bool render = true);

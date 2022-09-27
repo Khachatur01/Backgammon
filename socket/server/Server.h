@@ -40,7 +40,7 @@ namespace Socket {
         void broadcast(const std::string& data) const;
         void send_to(Client_t client, const std::string &data) const;
         void close() const;
-        void close(Client_t client) const;
+        void close(Client_t client);
     };
 }
 

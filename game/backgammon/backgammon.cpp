@@ -82,10 +82,14 @@ void Backgammon::set_peaces_on_board(const Player& viewer, board_t& board) {
 
 }
 void Backgammon::set_dices_on_bord(dices_t dices, board_t& board) {
-    board[Backgammon::HEIGHT / 2 - 1][Backgammon::WIDTH / 4] = Backgammon::DICES[dices.first - 1];
-    board[Backgammon::HEIGHT / 2][Backgammon::WIDTH / 4] = Backgammon::NUMBERS[dices.first - 1];
-    board[Backgammon::HEIGHT / 2 - 1][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::DICES[dices.second - 1];
-    board[Backgammon::HEIGHT / 2][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::NUMBERS[dices.second - 1];
+    if (dices.first == 0 || dices.second == 0) {
+        return;
+    }
+    board[Backgammon::HEIGHT / 2 - 1][Backgammon::WIDTH / 4] = Backgammon::DICES  [dices.first - 1];
+    board[Backgammon::HEIGHT / 2    ][Backgammon::WIDTH / 4] = Backgammon::NUMBERS[dices.first - 1];
+
+    board[Backgammon::HEIGHT / 2 - 1][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::DICES  [dices.second - 1];
+    board[Backgammon::HEIGHT / 2    ][Backgammon::WIDTH - Backgammon::WIDTH / 4] = Backgammon::NUMBERS[dices.second - 1];
 }
 void Backgammon::set_moves_on_bord(const Player& player, uint8_t peace, const std::vector<uint8_t>& available_pips_for_selected_peace, const std::vector<uint8_t>& all_available_pips, board_t& board) {
     if (peace == Backgammon::PIPS_COUNT) { /* if no selected PEACE, set all available pips */
@@ -271,7 +275,7 @@ Backgammon::Backgammon(bool auto_commit, Player_t render_for) {
 /* starter is default switch */
 void Backgammon::start(Player_t starter, bool render) {
     do {
-        this->throw_dice(render);
+        this->throw_dice(nullptr, render);
     } while (this->dices.first == this->dices.second);
 
     switch (starter) {
@@ -320,10 +324,9 @@ void Backgammon::render() {
             );
 }
 
-dices_t Backgammon::throw_dice(bool render, const dices_t* force_dices) {
+dices_t Backgammon::throw_dice(const dices_t* force_dices, bool render) {
     this->all_available_pips.clear();
     for (uint8_t i = 0; i < Backgammon::DICE_ROTATE_COUNT; ++i) {
-
         std::random_device random_device;
         std::default_random_engine engine(random_device());
         std::uniform_int_distribution<uint8_t> uniform_dist(1, 6);
@@ -361,6 +364,13 @@ dices_t Backgammon::throw_dice(bool render, const dices_t* force_dices) {
 
     }
     return this->dices;
+}
+void Backgammon::reset_dices(bool render) {
+    this->dices.first = 0;
+    this->dices.second = 0;
+    if (render) {
+        this->render();
+    }
 }
 
 void Backgammon::release_peace(bool render) {
@@ -430,7 +440,7 @@ bool Backgammon::move_to(uint8_t pip, bool render) {
 
     if (done && this->auto_commit && this->all_available_pips.empty()) {
         this->commit_moves(render);
-        this->throw_dice(render);
+        this->throw_dice(nullptr, render);
     }
     return done;
 }

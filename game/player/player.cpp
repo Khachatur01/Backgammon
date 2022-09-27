@@ -50,11 +50,12 @@ int8_t Player::get_move_pip(uint8_t pip, uint8_t step) const {
 }
 std::vector<uint8_t> Player::get_available_pips_for_peace(uint8_t peace, dices_t dices, const std::vector<move_t>& done_moves) const {
     std::vector<uint8_t> moves;
-    if (peace == 0 && !this->can_play_from_head(dices, done_moves)) { /* when playing from head, and played from head */
+
+    if (peace == this->PIPS_COUNT || dices.first == 0 || dices.second == 0) {
         return moves;
     }
 
-    if (peace == this->PIPS_COUNT) {
+    if (peace == 0 && !this->can_play_from_head(dices, done_moves)) { /* when playing from head, and played from head */
         return moves;
     }
 

@@ -13,11 +13,15 @@ void choose_server(BackgammonClient& client) {
     std::cin >> port;
 
     try {
-        client.set_server(host, port);
+        if (!client.set_server(host, port)) {
+            Backgammon::clear_screen();
+            std::cout << "Can't connect to host... Try again\n";
+            goto choose_server;
+        }
     } catch (socket_creation_exception &e) {
-        std::cout << e.what() << std::endl;
-    } catch (socket_bind_exception &e) {
-        std::cout << e.what() << std::endl;
+    } catch (server_init_exception &e) {
+        Backgammon::clear_screen();
+        std::cout << "Can't connect to host... Try again\n";
         goto choose_server;
     }
 }

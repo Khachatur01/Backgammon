@@ -92,7 +92,7 @@ void BackgammonClient::on_event(event::Event* event) {
         case Event_t::THROW_DICES: {
             auto* throw_dices = dynamic_cast<event::ThrowDices*>(event);
             auto force_dices = std::make_pair(throw_dices->first, throw_dices->second);
-            this->backgammon->throw_dice(true, &force_dices);
+            this->backgammon->throw_dice(&force_dices, true);
             break;
         }
         case Event_t::TAKE_PEACE: {
@@ -115,6 +115,7 @@ void BackgammonClient::on_event(event::Event* event) {
         }
         case Event_t::COMMIT_MOVES: {
             this->backgammon->commit_moves();
+            this->backgammon->reset_dices();
             this->on_play();
             std::cout << "Wait opponent to play...\n";
             break;
@@ -140,11 +141,11 @@ BackgammonClient::BackgammonClient(): me(Player_t::SWITCH) {
     this->clientSocket->create();
 }
 
-void BackgammonClient::set_server(const std::basic_string<char> &hostname, uint16_t port_number) {
+bool BackgammonClient::set_server(const std::basic_string<char> &hostname, uint16_t port_number) {
     this->host = hostname;
     this->port = port_number;
     this->clientSocket->init_host(hostname, port_number);
-    this->clientSocket->connect();
+    return this->clientSocket->connect();
 }
 
 void BackgammonClient::create_room(const std::string& room, const std::string& password) {

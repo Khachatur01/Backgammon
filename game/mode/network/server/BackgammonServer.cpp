@@ -1,4 +1,4 @@
-#include <iostream>
+#include <random>
 #include "BackgammonServer.h"
 
 /* private */
@@ -48,12 +48,22 @@ void BackgammonServer::on_event(Client_t sender, event::Event* event) {
             }
 
             if (room->white_player && room->black_player) {
-                /* todo choose player */
+                std::random_device random_device;
+                std::default_random_engine engine(random_device());
+                std::uniform_int_distribution<uint8_t> uniform_dist(0, 1);
+
+                Player_t starter;
+                if (uniform_dist(engine) == 0) {
+                    starter = Player_t::WHITE;
+                } else {
+                    starter = Player_t::BLACK;
+                }
+
                 this->serverSocket->send_to(*room->white_player,
-                    event::Start("", "", Player_t::WHITE).to_string()
+                    event::Start("", "", starter).to_string()
                 );
                 this->serverSocket->send_to(*room->black_player,
-                    event::Start("", "", Player_t::WHITE).to_string()
+                    event::Start("", "", starter).to_string()
                 );
             }
             break;

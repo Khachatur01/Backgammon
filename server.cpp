@@ -23,4 +23,5 @@ int main() {
         std::cout << e.what() << std::endl;
         goto port_input;
     }
+    while (1) {}
 }

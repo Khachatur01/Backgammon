@@ -57,7 +57,7 @@ std::thread Socket::Server::wait_message_from(Client_t client, size_t buffer_siz
             int64_t read = ::recv(client.socket_fd, buffer, buffer_size, 0);
             if (read > 0) {
                 this->on_message_from(buffer, client);
-            } else if (read == 0) { /* when receiving 0, it means that client is disconnected. no need to listen messages from that client */
+            } else if (read == 0) { /* 0 means client disconnected */
                 this->mutex.lock();
                 this->clients.remove(client);
                 this->mutex.unlock();
@@ -87,6 +87,9 @@ void Socket::Server::close() const {
         ::close(client.socket_fd);
     }
 }
-void Socket::Server::close(Client_t client) const {
+void Socket::Server::close(Client_t client) {
+    this->mutex.lock();
+    this->clients.remove(client);
+    this->mutex.unlock();
     ::close(client.socket_fd);
 }
