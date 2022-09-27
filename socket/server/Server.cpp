@@ -6,13 +6,14 @@
 
 /* private */
 /* public */
-Socket::Server::Server(uint8_t max_connections) {
+Socket::Server::Server() {
     this->socket_fd = 0;
-    this->max_connections = max_connections;
+    this->max_connections = 0;
 }
 Socket::Server::~Server() {
     this->close();
 }
+
 void Socket::Server::create() {
     this->socket_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (this->socket_fd < 0) {

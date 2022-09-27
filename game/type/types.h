@@ -26,11 +26,6 @@ enum Player_t {
     BLACK = 2
 };
 
-enum THREAD {
-    JOIN,
-    DETACH
-};
-
 typedef std::pair<uint8_t, uint8_t> dices_t;
 typedef std::pair<uint8_t, uint8_t> move_t; /* first: from_pip, second: to_pip */
 
