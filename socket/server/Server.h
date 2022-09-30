@@ -71,7 +71,7 @@ namespace Socket {
         /**
          * @param data send message to all connected clients
          * */
-        void broadcast(const std::string& data) const;
+        [[maybe_unused]] void broadcast(const std::string& data) const;
 
         /**
          * @param data message to send

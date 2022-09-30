@@ -148,19 +148,19 @@ bool BackgammonClient::set_server(const std::basic_string<char> &hostname, uint1
     return this->clientSocket->connect();
 }
 
-void BackgammonClient::create_room(const std::string& room, const std::string& password) {
+[[maybe_unused]] void BackgammonClient::create_room(const std::string& room, const std::string& password) {
     this->clientSocket->send(event::CreateRoom(room, password).to_string());
 }
 
-std::thread BackgammonClient::connect_room(const std::string& room, const std::string& password) {
-    this->clientSocket->send(event::ConnectRoom(room, password).to_string());
+[[maybe_unused]] std::thread BackgammonClient::create_room_and_connect(const std::string &room, const std::string &password) {
+    this->clientSocket->send(event::CreateRoomAndConnect(room, password).to_string());
     this->room_name = room;
     this->room_password = password;
     return this->clientSocket->wait_message(200);
 }
 
-std::thread BackgammonClient::create_room_and_connect(const std::string &room, const std::string &password) {
-    this->clientSocket->send(event::CreateRoomAndConnect(room, password).to_string());
+std::thread BackgammonClient::connect_room(const std::string& room, const std::string& password) {
+    this->clientSocket->send(event::ConnectRoom(room, password).to_string());
     this->room_name = room;
     this->room_password = password;
     return this->clientSocket->wait_message(200);

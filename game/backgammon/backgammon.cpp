@@ -309,7 +309,8 @@ std::string Backgammon::get_frame(Player_t viewer_t) {
         this->all_available_pips
     );
 }
-void Backgammon::render(Player_t viewer_t) {
+
+[[maybe_unused]] void Backgammon::render(Player_t viewer_t) {
     Backgammon::clear_screen();
     std::cout << this->get_frame(viewer_t);
 }

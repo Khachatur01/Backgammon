@@ -68,8 +68,9 @@ public:
 
     static void clear_screen();
     std::string get_frame(Player_t viewer_t);
-    void render(Player_t viewer_t);
-    void render();
+
+    [[maybe_unused]] void render(Player_t viewer_t);
+    [[maybe_unused]] void render();
     dices_t throw_dice(const dices_t* force_dices = nullptr, bool render = true);
     void reset_dices(bool render = true);
     bool take_peace(uint8_t peace_index, bool render = true);
@@ -77,7 +78,7 @@ public:
     bool move_to(uint8_t pip, bool render = true);
     bool commit_moves(bool render = true);
     void cancel_moves(bool render = true);
-    Player* get_player();
+    [[maybe_unused]] Player* get_player();
     Player* get_winner();
 };
 

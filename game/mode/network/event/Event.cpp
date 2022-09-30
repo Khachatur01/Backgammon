@@ -11,8 +11,8 @@ std::string event::Event::to_string() {
     return std::to_string(id) + sep + this->room + sep + this->password;
 }
 void event::Event::parse(std::vector<std::string> fields) {
-    this->room = fields[1];
-    this->password = fields[2];
+    this->room = std::move(fields[1]);
+    this->password = std::move(fields[2]);
 }
 event::Event* event::parse_message(const std::string& data) {
     Event* event = nullptr;
@@ -20,6 +20,18 @@ event::Event* event::parse_message(const std::string& data) {
     std::vector<std::string> event_list = event::split(data, Event::sep);
     auto id = static_cast<Event_t>(std::stoi(event_list[0]));
     switch (id) {
+        case Event_t::ROOM_EXISTS: {
+            event = new RoomExists();
+            break;
+        }
+        case Event_t::INCORRECT_PASSWORD: {
+            event = new IncorrectPassword();
+            break;
+        }
+        case Event_t::GAME_OVER: {
+            event = new GameOver();
+            break;
+        }
         case Event_t::CREATE_ROOM: {
             event = new CreateRoom();
             break;
@@ -199,6 +211,5 @@ event::ReleasePeace::ReleasePeace(const std::string& room, const std::string& pa
 event::CommitMoves::CommitMoves() : event::Event(Event_t::COMMIT_MOVES) {}
 event::CommitMoves::CommitMoves(const std::string& room, const std::string& password)
     : event::Event(Event_t::COMMIT_MOVES, room, password) {}
-
 
 #endif //EVENT

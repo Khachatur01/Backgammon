@@ -2,14 +2,14 @@
 #include <cstdint>
 #include "socket_exception.h"
 
-const char* socket_creation_exception::what() {
+[[maybe_unused]] const char* socket_creation_exception::what() {
     return (char*)"Can't create socket";
 }
 
 socket_bind_exception::socket_bind_exception(uint16_t port) {
     this->port = port;
 }
-const char* socket_bind_exception::what() {
+[[maybe_unused]] const char* socket_bind_exception::what() {
     char* message = new char[40];
     strcpy(message, "Can't bind socket on port ");
 
@@ -23,10 +23,10 @@ const char* socket_bind_exception::what() {
     strcat(message, port_str);
     return message;
 }
-uint16_t socket_bind_exception::get_port() const {
+[[maybe_unused]] uint16_t socket_bind_exception::get_port() const {
     return this->port;
 }
 
-const char* server_init_exception::what() {
+[[maybe_unused]] const char* server_init_exception::what() {
     return (char*)"Can't init server socket";
 }

@@ -23,9 +23,9 @@ public:
     BackgammonClient();
     bool set_server(const std::basic_string<char> &hostname, uint16_t port_number);
 
-    void create_room(const std::string& room, const std::string& password);
+    [[maybe_unused]] void create_room(const std::string& room, const std::string& password);
+    [[maybe_unused]] std::thread create_room_and_connect(const std::string &room, const std::string &password);
     std::thread connect_room(const std::string& room, const std::string& password);
-    std::thread create_room_and_connect(const std::string &room, const std::string &password);
 
     [[nodiscard]] std::string get_host() const;
     [[nodiscard]] uint16_t get_port() const;

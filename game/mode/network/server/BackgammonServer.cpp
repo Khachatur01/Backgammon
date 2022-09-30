@@ -68,34 +68,15 @@ void BackgammonServer::on_event(Client_t sender, event::Event* event) {
             }
             break;
         }
-        case Event_t::GAME_OVER: {
+        case Event_t::GAME_OVER:
+        case Event_t::THROW_DICES:
+        case Event_t::TAKE_PEACE:
+        case Event_t::MOVE_TO:
+        case Event_t::CANCEL_MOVES:
+        case Event_t::RELEASE_PEACE:
+        case Event_t::COMMIT_MOVES:
             this->serverSocket->send_to(*sender_opponent, event->to_string());
             break;
-        }
-        case Event_t::THROW_DICES: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
-        case Event_t::TAKE_PEACE: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
-        case Event_t::MOVE_TO: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
-        case Event_t::CANCEL_MOVES: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
-        case Event_t::RELEASE_PEACE: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
-        case Event_t::COMMIT_MOVES: {
-            this->serverSocket->send_to(*sender_opponent, event->to_string());
-            break;
-        }
         default:
             break;
     }

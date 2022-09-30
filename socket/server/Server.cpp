@@ -69,7 +69,7 @@ std::thread Socket::Server::wait_message_from(Client_t client, size_t buffer_siz
     });
 }
 
-void Socket::Server::broadcast(const std::string& data) const {
+[[maybe_unused]] void Socket::Server::broadcast(const std::string& data) const {
     for (Client_t client: this->clients) {
         std::thread([client, data]() {
             ::send(client.socket_fd, data.c_str(), data.size(), 0);
@@ -77,7 +77,9 @@ void Socket::Server::broadcast(const std::string& data) const {
     }
 }
 void Socket::Server::send_to(Client_t client, const std::string &data) const {
-    ::send(client.socket_fd, data.c_str(), data.size(), 0);
+    if (std::find(this->clients.begin(), this->clients.end(), client) != this->clients.end()) {
+        ::send(client.socket_fd, data.c_str(), data.size(), 0);
+    }
 }
 
 void Socket::Server::close() const {
