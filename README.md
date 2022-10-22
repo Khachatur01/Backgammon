@@ -1,7 +1,21 @@
  # Backgammon
 Backgammon game for console
 
+To build
+- cmake .
+- make
+
+> *After building you can remove all files except backgammon and server*
+
+To run game
+- ./backgammon
+
+To run server
+- ./server
+
+
 > *Note that minimum required window size should be 90x24 symbols and 49x24 when game started*
+
 
 The game has 3 options
 - ###### Local 2 player
