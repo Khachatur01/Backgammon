@@ -15,6 +15,7 @@ int main() {
     std::cin >> port;
 
     BackgammonServer backgammonServer;
+
     try {
         backgammonServer.run(port, max_rooms).join();
     } catch (socket_creation_exception &e) {

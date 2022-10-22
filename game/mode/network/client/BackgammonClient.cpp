@@ -23,7 +23,8 @@ void BackgammonClient::on_play() {
                 continue;
             } else if (pip == '1' && backgammon->commit_moves()) {
                 this->clientSocket->send(event::CommitMoves(this->room_name, this->room_password).to_string());
-                goto finish_playing;
+                /* end playing */
+                return;
             }
             valid_peace = backgammon->take_peace(pip);
             if (valid_peace) {
@@ -50,8 +51,18 @@ void BackgammonClient::on_play() {
     /* game over */
     this->clientSocket->send(event::GameOver(this->room_name, this->room_password, backgammon->get_winner()->TYPE).to_string());
 
-    finish_playing:
-    return;
+    std::cout << "\n"
+                 " ██████╗  █████╗ ███╗   ███╗███████╗       █████╗ ██╗   ██╗███████╗██████╗ \n"
+                 "██╔════╝ ██╔══██╗████╗ ████║██╔════╝      ██╔══██╗██║   ██║██╔════╝██╔══██╗\n"
+                 "██║  ██╗ ███████║██╔████╔██║█████╗        ██║  ██║╚██╗ ██╔╝█████╗  ██████╔╝\n"
+                 "██║  ╚██╗██╔══██║██║╚██╔╝██║██╔══╝        ██║  ██║ ╚████╔╝ ██╔══╝  ██╔══██╗\n"
+                 "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗      ╚█████╔╝  ╚██╔╝  ███████╗██║  ██║\n"
+                 " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝       ╚════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝\n"
+              << "Winner is " << this->backgammon->get_winner()->PEACE << '\n';
+
+    std::string enter;
+    std::cout << "Enter something to exit.\n";
+    std::cin >> enter;
 }
 
 void BackgammonClient::on_event(const std::string& event) {

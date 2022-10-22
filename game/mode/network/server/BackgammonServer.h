@@ -21,8 +21,8 @@ private:
     std::unordered_map<std::string, Room*> rooms;
     Socket::Server* serverSocket;
 
-    void on_event(Client_t sender, const std::string& message);
-    void on_event(Client_t sender, event::Event* event);
+    void on_message(Client_t sender, const std::string& message);
+    void on_message(Client_t sender, event::Event* event);
 public:
     BackgammonServer();
     std::thread run(uint16_t port, uint64_t max_rooms = 0);

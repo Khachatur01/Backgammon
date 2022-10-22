@@ -9,12 +9,12 @@ Room::Room(const std::string& password) {
 
 
 /* private */
-void BackgammonServer::on_event(Client_t sender, const std::string& event) {
-    this->on_event(sender, event::parse_message(event));
+void BackgammonServer::on_message(Client_t sender, const std::string& message) {
+    this->on_message(sender, event::parse_message(message));
 }
-void BackgammonServer::on_event(Client_t sender, event::Event* event) {
+void BackgammonServer::on_message(Client_t sender, event::Event* event) {
     if (event->id == Event_t::CREATE_ROOM || event->id == Event_t::CREATE_ROOM_AND_CONNECT) {
-        for (auto & room : this->rooms){
+        for (auto& room : this->rooms){
             if (room.first == event->room) {
                 this->serverSocket->send_to(sender, event::RoomExists(event->room, event->password).to_string());
                 return;
@@ -102,7 +102,7 @@ BackgammonServer::BackgammonServer() {
     };
 
     this->serverSocket->on_message_from = [&](const std::string &data, Client_t from) {
-        this->on_event(from, data);
+        this->on_message(from, data);
     };
 }
 
