@@ -34,6 +34,7 @@ void create_room(BackgammonClient& client) {
     std::cout << "Password: ";
     std::cin >> password;
 
+    Backgammon::clear_screen();
     client.create_room_and_connect(room, password).join();
 }
 void connect_to_room(BackgammonClient& client) {
@@ -59,7 +60,7 @@ void network_mode() {
         if (!client.get_host().empty()) {
             std::cout << "Host -> " << client.get_host() << ':' << client.get_port() << '\n';
         } else {
-            std::cout << "Choose host at first...\n";
+            std::cout << "Host not selected...\n";
         }
 
         std::cout << "<) Back\n";

@@ -96,8 +96,6 @@ void BackgammonClient::on_event(event::Event* event) {
             if (start->starter == this->me) {
                 this->on_play();
             }
-            std::cout << "Wait opponent to play...\n";
-
             break;
         }
         case Event_t::THROW_DICES: {
@@ -128,7 +126,6 @@ void BackgammonClient::on_event(event::Event* event) {
             this->backgammon->commit_moves();
             this->backgammon->reset_dices();
             this->on_play();
-            std::cout << "Wait opponent to play...\n";
             break;
         }
         default:
