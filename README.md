@@ -142,3 +142,7 @@ So if pip, matching with one of dice, is empty, player can bear off(remove) from
 Current player beared off(removed) peaces appearing in right column, and opponent beared off(removed) peaces in left column.
 
 ![image](https://user-images.githubusercontent.com/39254771/197341672-e43e272c-3640-473f-a792-a6720ae60cc7.png)
+
+After game over, players can see the winner peace.
+
+![image](https://user-images.githubusercontent.com/39254771/197343519-0b5e07de-f53a-4690-b905-9143f9287eb8.png)
