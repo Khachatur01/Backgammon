@@ -46,9 +46,8 @@ void Socket::Client::send(const std::string& data) const {
 }
 
 std::thread Socket::Client::wait_message(size_t buffer_size) {
-    char *buffer = new char[buffer_size];
-
-    return std::thread([this, buffer, buffer_size]() {
+    return std::thread([this, buffer_size]() {
+        char *buffer = new char[buffer_size];
         while (true) {
             bzero(buffer, buffer_size);
             int64_t read = ::read(this->socket_fd, buffer, buffer_size);
@@ -59,6 +58,7 @@ std::thread Socket::Client::wait_message(size_t buffer_size) {
                 break;
             }
         }
+        delete[] buffer;
     });
 }
 void Socket::Client::close() const {

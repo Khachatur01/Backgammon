@@ -68,6 +68,7 @@ void BackgammonServer::on_message(Client_t sender, event::Event* event) {
             }
             break;
         }
+
         case Event_t::GAME_OVER:
         case Event_t::THROW_DICES:
         case Event_t::TAKE_PEACE:
@@ -80,6 +81,7 @@ void BackgammonServer::on_message(Client_t sender, event::Event* event) {
         default:
             break;
     }
+    delete event;
 }
 /* public */
 BackgammonServer::BackgammonServer() {
@@ -104,6 +106,12 @@ BackgammonServer::BackgammonServer() {
     this->serverSocket->on_message_from = [&](const std::string &data, Client_t from) {
         this->on_message(from, data);
     };
+}
+BackgammonServer::~BackgammonServer() {
+    delete this->serverSocket;
+    for (auto &room : this->rooms) {
+        delete room.second;
+    }
 }
 
 std::thread BackgammonServer::run(uint16_t port, uint64_t max_rooms) {

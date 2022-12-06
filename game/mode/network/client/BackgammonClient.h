@@ -21,6 +21,7 @@ private:
     void on_event(event::Event* event);
 public:
     BackgammonClient();
+    ~BackgammonClient();
     bool set_server(const std::basic_string<char> &hostname, uint16_t port_number);
 
     [[maybe_unused]] void create_room(const std::string& room, const std::string& password);

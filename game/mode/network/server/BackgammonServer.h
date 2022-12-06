@@ -25,6 +25,7 @@ private:
     void on_message(Client_t sender, event::Event* event);
 public:
     BackgammonServer();
+    ~BackgammonServer();
     std::thread run(uint16_t port, uint64_t max_rooms = 0);
 };
 #endif //BACKGAMMON_SERVER_H

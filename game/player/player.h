@@ -15,6 +15,7 @@ public:
     const Player_t TYPE;
 
     Player(uint8_t pips_count, std::string peace, Player_t type);
+    ~Player();
 
     /**
      * get opponent pip equivalent to player pip

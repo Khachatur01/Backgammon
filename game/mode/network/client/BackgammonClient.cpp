@@ -131,6 +131,8 @@ void BackgammonClient::on_event(event::Event* event) {
         default:
             break;
     }
+
+    delete event;
 }
 
 /* public */
@@ -147,6 +149,10 @@ BackgammonClient::BackgammonClient(): me(Player_t::SWITCH) {
     };
 
     this->clientSocket->create();
+}
+BackgammonClient::~BackgammonClient() {
+    delete this->backgammon;
+    delete this->clientSocket;
 }
 
 bool BackgammonClient::set_server(const std::basic_string<char> &hostname, uint16_t port_number) {

@@ -51,8 +51,8 @@ std::thread Socket::Server::wait_connection() {
     });
 }
 std::thread Socket::Server::wait_message_from(Client_t client, size_t buffer_size) {
-    char *buffer = new char[buffer_size];
-    return std::thread([this, client, buffer, buffer_size]() {
+    return std::thread([this, client, buffer_size]() {
+        char *buffer = new char[buffer_size];
         while (true) {
             bzero(buffer, buffer_size);
             int64_t read = ::recv(client.socket_fd, buffer, buffer_size, 0);
@@ -66,6 +66,7 @@ std::thread Socket::Server::wait_message_from(Client_t client, size_t buffer_siz
                 break;
             }
         }
+        delete[] buffer;
     });
 }
 

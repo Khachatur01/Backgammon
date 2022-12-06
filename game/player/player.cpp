@@ -10,6 +10,9 @@ Player::Player(uint8_t pips_count, std::string peace, Player_t type) : PIPS_COUN
     this->peaces = new uint8_t[pips_count]{0};
     this->peaces[0] = this->PEACES_COUNT;
 }
+Player::~Player() {
+    delete[] this->peaces;
+}
 
 uint8_t Player::opponent_pip(uint8_t pip) const {
     if (pip >= 0 && pip < this->PIPS_COUNT / 2) {
