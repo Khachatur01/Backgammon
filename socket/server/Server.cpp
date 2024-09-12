@@ -3,6 +3,7 @@
 #include <thread>
 #include <cstring>
 #include <iostream>
+#include <algorithm>
 
 /* private */
 /* public */
